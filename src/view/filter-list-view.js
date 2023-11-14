@@ -1,15 +1,17 @@
 import {createElement} from '../render';
 
-const createFilterTemplate = () => (
+const FILTE_TYPES = ['everything', 'future', 'present', 'past'];
+
+const createFilterTemplate = (filterType) => (
   `<div class="trip-filters__filter">
-    <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything" checked>
-    <label class="trip-filters__filter-label" for="filter-everything">Everything</label>
+    <input id="filter-${filterType}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${filterType}" checked>
+    <label class="trip-filters__filter-label" for="filter-${filterType}">${filterType}</label>
   </div>`
 );
 
 const createFilterListTemplate = () => (
   `<form class="trip-filters" action="#" method="get">
-    ${createFilterTemplate()}
+    ${FILTE_TYPES.map((item) => createFilterTemplate(item)).join('')}
     <button class="visually-hidden" type="submit">Accept filter</button>
   </form>`
 );

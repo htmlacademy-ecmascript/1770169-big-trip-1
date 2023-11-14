@@ -1,15 +1,17 @@
 import {createElement} from '../render';
 
-const createSortTemplate = () => (
-  `<div class="trip-sort__item  trip-sort__item--day">
-    <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-day" checked>
-    <label class="trip-sort__btn" for="sort-day">Day</label>
+const SORT_TYPES = ['day', 'event', 'time', 'price', 'offer'];
+
+const createSortTemplate = (sortType) => (
+  `<div class="trip-sort__item  trip-sort__item--${sortType}">
+    <input id="sort-${sortType}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${sortType}" checked>
+    <label class="trip-sort__btn" for="sort-${sortType}">${sortType}</label>
   </div>`
 );
 
 const createSortListTemplate = () => (
   `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-    ${createSortTemplate()}
+    ${SORT_TYPES.map((item) => createSortTemplate(item)).join('')}
   </form>`
 );
 
