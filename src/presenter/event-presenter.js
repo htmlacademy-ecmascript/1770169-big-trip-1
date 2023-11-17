@@ -5,9 +5,6 @@ import EventListView from '../view/event-list-view';
 import FilterListView from '../view/filter-list-view';
 import InfoView from '../view/info-view';
 import SortListView from '../view/sort-list-view';
-
-const EVENT_CARD_COUNT = 3;
-
 export default class EventPresenter {
   eventListComponent = new EventListView();
 
@@ -44,8 +41,14 @@ export default class EventPresenter {
     render(new SortListView(), this.eventsContainer);
     render(this.eventListComponent, this.eventsContainer);
     render(new EventEditView(), this.eventListComponent.getElement());
-    for (let i = 0; i < EVENT_CARD_COUNT; i++) {
-      render(new EventCardView(), this.eventListComponent.getElement());
+    for (let i = 0; i < this.points.length; i++) {
+      render(new EventCardView(
+        {
+          point: this.points[i],
+          destination: this.destinationsModel.getDestinationsById(this.points[i].destination),
+          offers: this.offersModel.getOfferItemsById(this.points[i].type, this.points[i].offers)
+        }
+      ), this.eventListComponent.getElement());
     }
   }
 }
