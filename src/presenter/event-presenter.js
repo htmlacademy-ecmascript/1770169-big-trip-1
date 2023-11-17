@@ -34,7 +34,12 @@ export default class EventPresenter {
     this.destinations = this.destinationsModel.getDestinations();
     this.offers = this.offersModel.getOffers();
 
-    render(new InfoView(), this.tripMainContainer, RenderPosition.AFTERBEGIN);
+    render(new InfoView(
+      {
+        points: this.points,
+        destinations: this.destinations
+      }
+    ), this.tripMainContainer, RenderPosition.AFTERBEGIN);
     render(new FilterListView(), this.filterContainer);
     render(new SortListView(), this.eventsContainer);
     render(this.eventListComponent, this.eventsContainer);
