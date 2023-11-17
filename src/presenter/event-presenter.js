@@ -15,15 +15,25 @@ export default class EventPresenter {
     {
       tripMainContainer,
       filterContainer,
-      eventsContainer
+      eventsContainer,
+      pointsModel,
+      destinationsModel,
+      offersModel
     }
   ) {
     this.tripMainContainer = tripMainContainer;
     this.filterContainer = filterContainer;
     this.eventsContainer = eventsContainer;
+    this.pointsModel = pointsModel;
+    this.destinationsModel = destinationsModel;
+    this.offersModel = offersModel;
   }
 
   init () {
+    this.points = this.pointsModel.getPoints();
+    this.destinations = this.destinationsModel.getDestinations();
+    this.offers = this.offersModel.getOffers();
+
     render(new InfoView(), this.tripMainContainer, RenderPosition.AFTERBEGIN);
     render(new FilterListView(), this.filterContainer);
     render(new SortListView(), this.eventsContainer);
