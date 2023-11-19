@@ -27,4 +27,14 @@ const getAbbreviatedFormat = (milliseconds) => {
   }
 };
 
-export {toCapitalize, getDestinationNames, getPriceSum, getAbbreviatedFormat};
+const getLastTwoWords = (text) => {
+  const textArray = text.toLowerCase().split(' ');
+
+  if (textArray.length <= 2) {
+    return textArray.join('-');
+  }
+
+  return textArray.slice(textArray.length - 2).join('-');
+};
+
+export {toCapitalize, getDestinationNames, getPriceSum, getAbbreviatedFormat, getLastTwoWords};
