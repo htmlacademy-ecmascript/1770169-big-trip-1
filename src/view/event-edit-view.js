@@ -1,71 +1,7 @@
 import dayjs from 'dayjs';
 import {createElement} from '../render';
+import {EVENT_TYPES, DEFAULT_POINT, DateFormat} from '../const.js';
 import {getLastTwoWords, toCapitalize} from '../utils';
-
-const EVENT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
-const DEFAULT_POINT = {
-  type: 'taxi',
-  dateFrom: dayjs(),
-  dateTo: dayjs().hour(1),
-  destination: {
-    name: 'Chamonix',
-    description: 'Chamonix, is a beautiful city, a true asian pearl, with a beautiful old town.',
-    pictures: [
-      {
-        src: 'https://20.ecmascript.pages.academy/static/destinations/4.jpg',
-        description: 'Chamonix embankment'
-      },
-      {
-        src: 'https://20.ecmascript.pages.academy/static/destinations/8.jpg',
-        description: 'Chamonix park'
-      },
-      {
-        src: 'https://20.ecmascript.pages.academy/static/destinations/15.jpg',
-        description: 'Chamonix kindergarten'
-      },
-      {
-        src: 'https://20.ecmascript.pages.academy/static/destinations/16.jpg',
-        description: 'Chamonix biggest supermarket'
-      },
-      {
-        src: 'https://20.ecmascript.pages.academy/static/destinations/19.jpg',
-        description: 'Chamonix street market'
-      }
-    ]
-  },
-  basePrice: 10,
-  isFavorite: false,
-  offers: {
-    type: 'taxi',
-    offers: [
-      {
-        id: '96e801da-19f2-415a-aa24-5a915f325a35',
-        title: 'Upgrade to a business class',
-        price: 190
-      },
-      {
-        id: '729b6025-85de-485a-9a01-e18db921e4b6',
-        title: 'Choose the radio station',
-        price: 30
-      },
-      {
-        id: '209d6f48-5ac5-4970-bd0d-3dfc4f932ae6',
-        title: 'Choose temperature',
-        price: 170
-      },
-      {
-        id: 'ba40315d-09e4-4c03-b824-eee045bc5178',
-        title: 'Drive quickly, I\'m in a hurry',
-        price: 100
-      },
-      {
-        id: '5a360f33-4a66-449a-bef8-707cc7376b2a',
-        title: 'Drive slowly',
-        price: 110
-      }
-    ]
-  }
-};
 
 const createTypeTemplate = (type) => (
   `<div class="event__type-item">
@@ -103,10 +39,10 @@ const createHeaderTemplate = ({name}, availableCities, {type, dateFrom, dateTo, 
 
     <div class="event__field-group  event__field-group--time">
       <label class="visually-hidden" for="event-start-time-1">From</label>
-      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value=${dayjs(dateFrom).format('DD/MM/YY[&nbsp;]HH:mm')}>
+      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value=${dayjs(dateFrom).format(DateFormat.DAY_MONTH_YEAR)}>
       &mdash;
       <label class="visually-hidden" for="event-end-time-1">To</label>
-      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value=${dayjs(dateTo).format('DD/MM/YY[&nbsp;]HH:mm')}>
+      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value=${dayjs(dateTo).format(DateFormat.DAY_MONTH_YEAR)}>
     </div>
 
     <div class="event__field-group  event__field-group--price">
@@ -126,13 +62,13 @@ const createHeaderTemplate = ({name}, availableCities, {type, dateFrom, dateTo, 
 );
 
 const createOfferTemplate = ({id, title, price}, checkedOffers) => {
-  const prefix = getLastTwoWords(title);
+  const postfix = getLastTwoWords(title);
   const checked = checkedOffers.includes(id) ? 'checked' : '';
 
   return (
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${prefix}-1" type="checkbox" name="event-offer-${prefix}" ${checked}>
-      <label class="event__offer-label" for="event-offer-${prefix}-1">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${postfix}-1" type="checkbox" name="event-offer-${postfix}" ${checked}>
+      <label class="event__offer-label" for="event-offer-${postfix}-1">
         <span class="event__offer-title">${title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${price}</span>
