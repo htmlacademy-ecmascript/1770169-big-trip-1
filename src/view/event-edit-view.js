@@ -124,6 +124,12 @@ const createEventEditTemplate = (
 );
 
 export default class EventEditView extends AbstractView {
+  #point = null;
+  #destination = null;
+  #availableCities = null;
+  #offers = null;
+  #checkedOffers = null;
+
   constructor (
     {
       point = DEFAULT_POINT,
@@ -134,20 +140,20 @@ export default class EventEditView extends AbstractView {
     }
   ) {
     super();
-    this.point = point;
-    this.destination = destination;
-    this.availableCities = availableCities;
-    this.offers = offers;
-    this.checkedOffers = checkedOffers;
+    this.#point = point;
+    this.#destination = destination;
+    this.#availableCities = availableCities;
+    this.#offers = offers;
+    this.#checkedOffers = checkedOffers;
   }
 
   get template () {
     return createEventEditTemplate(
-      this.point,
-      this.destination,
-      this.availableCities,
-      this.offers,
-      this.checkedOffers
+      this.#point,
+      this.#destination,
+      this.#availableCities,
+      this.#offers,
+      this.#checkedOffers
     );
   }
 }

@@ -53,14 +53,18 @@ const createEventCardTemplate = ({type, dateFrom, dateTo, basePrice, isFavorite}
 };
 
 export default class EventCardView extends AbstractView {
+  #point = null;
+  #destination = null;
+  #offers = null;
+
   constructor ({point, destination, offers}) {
     super ();
-    this.point = point;
-    this.destination = destination;
-    this.offers = offers;
+    this.#point = point;
+    this.#destination = destination;
+    this.#offers = offers;
   }
 
   get template () {
-    return createEventCardTemplate(this.point, this.destination, this.offers);
+    return createEventCardTemplate(this.#point, this.#destination, this.#offers);
   }
 }
