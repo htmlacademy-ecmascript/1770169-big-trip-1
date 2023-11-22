@@ -1,5 +1,5 @@
+import AbstractView from '../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
-import {createElement} from '../render';
 import {EVENT_TYPES, DEFAULT_POINT, DateFormat} from '../const.js';
 import {getLastTwoWords, toCapitalize} from '../utils';
 
@@ -123,7 +123,7 @@ const createEventEditTemplate = (
   </li>`
 );
 
-export default class EventEditView {
+export default class EventEditView extends AbstractView {
   constructor (
     {
       point = DEFAULT_POINT,
@@ -133,6 +133,7 @@ export default class EventEditView {
       checkedOffers = []
     }
   ) {
+    super();
     this.point = point;
     this.destination = destination;
     this.availableCities = availableCities;
@@ -140,7 +141,7 @@ export default class EventEditView {
     this.checkedOffers = checkedOffers;
   }
 
-  getTemplate () {
+  get template () {
     return createEventEditTemplate(
       this.point,
       this.destination,
@@ -148,16 +149,5 @@ export default class EventEditView {
       this.offers,
       this.checkedOffers
     );
-  }
-
-  getElement () {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement () {
-    this.element = null;
   }
 }

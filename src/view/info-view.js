@@ -1,6 +1,6 @@
+import AbstractView from '../framework/view/abstract-view';
 import dayjs from 'dayjs';
 import minMax from 'dayjs/plugin/minMax';
-import {createElement} from '../render';
 import {getDestinationNames, getPriceSum} from '../utils';
 
 dayjs.extend(minMax);
@@ -31,24 +31,14 @@ const createInfoTemplate = (points, destinations) => {
   );
 };
 
-export default class InfoView {
+export default class InfoView extends AbstractView {
   constructor ({points, destinations}) {
+    super();
     this.points = points;
     this.destinations = destinations;
   }
 
-  getTemplate () {
+  get template () {
     return createInfoTemplate(this.points, this.destinations);
-  }
-
-  getElement () {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement () {
-    this.element = null;
   }
 }
