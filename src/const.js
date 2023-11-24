@@ -13,27 +13,22 @@ const DEFAULT_OFFERS = {
   type: 'taxi',
   offers: [
     {
-      id: '96e801da-19f2-415a-aa24-5a915f325a35',
       title: 'Upgrade to a business class',
       price: 190
     },
     {
-      id: '729b6025-85de-485a-9a01-e18db921e4b6',
       title: 'Choose the radio station',
       price: 30
     },
     {
-      id: '209d6f48-5ac5-4970-bd0d-3dfc4f932ae6',
       title: 'Choose temperature',
       price: 170
     },
     {
-      id: 'ba40315d-09e4-4c03-b824-eee045bc5178',
       title: 'Drive quickly, I\'m in a hurry',
       price: 100
     },
     {
-      id: '5a360f33-4a66-449a-bef8-707cc7376b2a',
       title: 'Drive slowly',
       price: 110
     }

@@ -95,7 +95,7 @@ const createDestinationTemplate = ({description, pictures}) => (
 
     <div class="event__photos-container">
       <div class="event__photos-tape">
-        ${pictures.length && pictures.map((picture) => createPhotoTemplate(picture)).join('')}
+        ${pictures.length !== 0 ? pictures.map((picture) => createPhotoTemplate(picture)).join('') : ''}
       </div>
     </div>
   </section>`
@@ -103,8 +103,8 @@ const createDestinationTemplate = ({description, pictures}) => (
 
 const createEventDetailsTemplate = (destination, offers, checkedOffers) => (
   `<section class="event__details">
-    ${offers.offers.length && createOfferListTemplate(offers, checkedOffers)}
-    ${Object.keys(destination).length > 2 && createDestinationTemplate(destination)}
+    ${offers.offers.length !== 0 ? createOfferListTemplate(offers, checkedOffers) : ''}
+    ${Object.keys(destination).length > 2 ? createDestinationTemplate(destination) : ''}
   </section>`
 );
 
@@ -129,6 +129,8 @@ export default class EventEditView extends AbstractView {
   #availableCities = null;
   #offers = null;
   #checkedOffers = null;
+  #handleFormSubmit = null;
+  #handleRollupButtonClick = null;
 
   constructor (
     {
@@ -136,7 +138,9 @@ export default class EventEditView extends AbstractView {
       destination = DEFAULT_POINT.destination,
       availableCities,
       offers = DEFAULT_POINT.offers,
-      checkedOffers = []
+      checkedOffers = [],
+      onFormSubmit,
+      onRollupButtonClick
     }
   ) {
     super();
@@ -145,6 +149,10 @@ export default class EventEditView extends AbstractView {
     this.#availableCities = availableCities;
     this.#offers = offers;
     this.#checkedOffers = checkedOffers;
+    this.#handleFormSubmit = onFormSubmit;
+    this.#handleRollupButtonClick = onRollupButtonClick;
+    this.element.querySelector('.event--edit').addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#handleRollupButtonClick);
   }
 
   get template () {
@@ -155,5 +163,10 @@ export default class EventEditView extends AbstractView {
       this.#offers,
       this.#checkedOffers
     );
+  }
+
+  #formSubmitHandler (evt) {
+    evt.preventDefault();
+    this.#handleFormSubmit();
   }
 }
