@@ -6,7 +6,9 @@ import FilterListView from '../view/filter-list-view';
 import InfoView from '../view/info-view';
 import SortListView from '../view/sort-list-view';
 import {getDestinationNames} from '../utils';
+import EmptyEventsMessageView from '../view/empty-events-message-view';
 export default class EventPresenter {
+  #filterValue = null;
   #eventListComponent = new EventListView();
   #tripMainContainer = null;
   #filterContainer = null;
@@ -44,16 +46,30 @@ export default class EventPresenter {
     this.#points = this.#pointsModel.points;
     this.#destinations = this.#destinationsModel.destinations;
     this.#offers = this.#offersModel.offers;
-
-    render(new InfoView(
-      {
-        points: this.#points,
-        destinations: this.#destinations
+    const filterChangeHandler = (evt) => {
+      if (evt.target.matches('.trip-filters__filter-input')) {
+        this.#filterValue = evt.target.value;
       }
-    ), this.#tripMainContainer, RenderPosition.AFTERBEGIN);
-    render(new FilterListView(), this.#filterContainer);
-    render(new SortListView(), this.#eventsContainer);
+    };
+
+    if (this.#points.length !== 0) {
+      render(new InfoView(
+        {
+          points: this.#points,
+          destinations: this.#destinations
+        }
+      ), this.#tripMainContainer, RenderPosition.AFTERBEGIN);
+    }
+    render(new FilterListView({onFilterChange: filterChangeHandler}), this.#filterContainer);
+
+    if (this.#points.length !== 0) {
+      render(new SortListView(), this.#eventsContainer);
+    }
     render(this.#eventListComponent, this.#eventsContainer);
+
+    if (this.#points.length === 0) {
+      return render(new EmptyEventsMessageView({filterType: this.#filterValue}), this.#eventsContainer);
+    }
 
     for (let i = 0; i < this.#points.length; i++) {
       this.#renderEventCard(this.#points[i]);

@@ -84,8 +84,8 @@ const DateFormat = {
   DAY_HOUR_MINUTES_WITH_POSTFIX: 'DD[D] HH[H] mm[M]'
 };
 
-const FILTE_TYPES = ['everything', 'future', 'present', 'past'];
+const FILTER_TYPES = ['everything', 'future', 'present', 'past'];
 
 const SORT_TYPES = ['day', 'event', 'time', 'price', 'offer'];
 
-export {FILTER_TYPE, EVENT_TYPES, DEFAULT_POINT, DateFormat, FILTE_TYPES, SORT_TYPES};
+export {FILTER_TYPE, EVENT_TYPES, DEFAULT_POINT, DateFormat, FILTER_TYPES, SORT_TYPES};
