@@ -1,4 +1,4 @@
-import {RenderPosition, render} from '../render';
+import {RenderPosition, render, replace} from '../framework/render';
 import EventCardView from '../view/event-card-view';
 import EventEditView from '../view/event-edit-view';
 import EventListView from '../view/event-list-view';
@@ -7,7 +7,16 @@ import InfoView from '../view/info-view';
 import SortListView from '../view/sort-list-view';
 import {getDestinationNames} from '../utils';
 export default class EventPresenter {
-  eventListComponent = new EventListView();
+  #eventListComponent = new EventListView();
+  #tripMainContainer = null;
+  #filterContainer = null;
+  #eventsContainer = null;
+  #pointsModel = null;
+  #destinationsModel = null;
+  #offersModel = null;
+  #points = null;
+  #destinations = null;
+  #offers = null;
 
   constructor (
     {
@@ -19,45 +28,98 @@ export default class EventPresenter {
       offersModel
     }
   ) {
-    this.tripMainContainer = tripMainContainer;
-    this.filterContainer = filterContainer;
-    this.eventsContainer = eventsContainer;
-    this.pointsModel = pointsModel;
-    this.destinationsModel = destinationsModel;
-    this.offersModel = offersModel;
+    this.#tripMainContainer = tripMainContainer;
+    this.#filterContainer = filterContainer;
+    this.#eventsContainer = eventsContainer;
+    this.#pointsModel = pointsModel;
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
   }
 
   init () {
-    this.points = this.pointsModel.getPoints();
-    this.destinations = this.destinationsModel.getDestinations();
-    this.offers = this.offersModel.getOffers();
+    this.#renderEventElements();
+  }
+
+  #renderEventElements () {
+    this.#points = this.#pointsModel.points;
+    this.#destinations = this.#destinationsModel.destinations;
+    this.#offers = this.#offersModel.offers;
 
     render(new InfoView(
       {
-        points: this.points,
-        destinations: this.destinations
+        points: this.#points,
+        destinations: this.#destinations
       }
-    ), this.tripMainContainer, RenderPosition.AFTERBEGIN);
-    render(new FilterListView(), this.filterContainer);
-    render(new SortListView(), this.eventsContainer);
-    render(this.eventListComponent, this.eventsContainer);
-    render(new EventEditView(
-      {
-        point: this.pointsModel.getPointById(this.points[0].id),
-        destination: this.destinationsModel.getDestinationsById(this.points[0].destination),
-        availableCities: getDestinationNames(this.destinations),
-        offers: this.offersModel.getOffersByType(this.points[0].type),
-        checkedOffers: this.points[0].offers
-      }
-    ), this.eventListComponent.getElement());
-    for (let i = 0; i < this.points.length; i++) {
-      render(new EventCardView(
-        {
-          point: this.points[i],
-          destination: this.destinationsModel.getDestinationsById(this.points[i].destination),
-          offers: this.offersModel.getOfferItemsById(this.points[i].type, this.points[i].offers)
-        }
-      ), this.eventListComponent.getElement());
+    ), this.#tripMainContainer, RenderPosition.AFTERBEGIN);
+    render(new FilterListView(), this.#filterContainer);
+    render(new SortListView(), this.#eventsContainer);
+    render(this.#eventListComponent, this.#eventsContainer);
+
+    for (let i = 0; i < this.#points.length; i++) {
+      this.#renderEventCard(this.#points[i]);
     }
+  }
+
+  #renderEventCard (point) {
+    let isEventOpen = false;
+    const documentKeydownHandler = (evt) => {
+      if (evt.key === 'Escape') {
+        hideEventEdit();
+      }
+    };
+
+    const formSubmitHandler = () => {
+      hideEventEdit();
+    };
+
+    const rollupButtonClickHandler = () => {
+      if (isEventOpen) {
+        return hideEventEdit();
+      }
+      return showEventEdit();
+    };
+
+    function showEventEdit () {
+      replaceEventCard();
+      document.addEventListener('keydown', documentKeydownHandler);
+      isEventOpen = true;
+    }
+
+    function hideEventEdit () {
+      replaceEventEdit();
+      document.removeEventListener('keydown', documentKeydownHandler);
+      isEventOpen = false;
+    }
+
+    const eventCardComponent = new EventCardView(
+      {
+        point: point,
+        destination: this.#destinationsModel._getDestinationsById(point.destination),
+        offers: this.#offersModel._getOfferItemsById(point.type, point.offers),
+        onRollupButtonClick: rollupButtonClickHandler
+      }
+    );
+
+    const eventEditComponent = new EventEditView(
+      {
+        point: point,
+        destination: this.#destinationsModel._getDestinationsById(point.destination),
+        availableCities: getDestinationNames(this.#destinations),
+        offers: this.#offersModel._getOffersByType(point.type),
+        checkedOffers: point.offers,
+        onFormSubmit: formSubmitHandler,
+        onRollupButtonClick: rollupButtonClickHandler
+      }
+    );
+
+    function replaceEventCard () {
+      replace(eventEditComponent, eventCardComponent);
+    }
+
+    function replaceEventEdit () {
+      replace(eventCardComponent, eventEditComponent);
+    }
+
+    render(eventCardComponent, this.#eventListComponent.element);
   }
 }

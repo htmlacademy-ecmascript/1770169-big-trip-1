@@ -1,11 +1,14 @@
 import {points} from '../mock/points.js';
 
 export default class PointsModel {
-  getPoints () {
-    return points;
+  #points = null;
+
+  get points () {
+    this.#points = points;
+    return this.#points;
   }
 
-  getPointById (id) {
-    return points.find((point) => point.id === id);
+  _getPointById (id) {
+    return this.#points.find((point) => point.id === id);
   }
 }

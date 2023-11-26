@@ -1,6 +1,7 @@
+import AbstractView from '../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
-import {createElement} from '../render';
 import {toCapitalize, getAbbreviatedFormat} from '../utils.js';
+import {DateFormat} from '../const.js';
 
 const createOfferTemplate = ({title, price}) => (
   `<li class="event__offer">
@@ -17,16 +18,16 @@ const createEventCardTemplate = ({type, dateFrom, dateTo, basePrice, isFavorite}
   return (
     `<li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime=${dayjs(dateFrom).format('YYYY-MM-DDTHH:mm')}>${dayjs(dateFrom).format('MMM DD')}</time>
+        <time class="event__date" datetime=${dayjs(dateFrom).format(DateFormat.DATETIME_ATTRIBUTE)}>${dayjs(dateFrom).format(DateFormat.MONTH_DAY)}</time>
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${toCapitalize(type)} ${name}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime=${dayjs(dateFrom).format('YYYY-MM-DDTHH:mm')}>${dayjs(dateFrom).format('HH:MM')}</time>
+            <time class="event__start-time" datetime=${dayjs(dateFrom).format(DateFormat.DATETIME_ATTRIBUTE)}>${dayjs(dateFrom).format(DateFormat.HOUR_MINUTES)}</time>
             &mdash;
-            <time class="event__end-time" datetime=${dayjs(dateTo).format('YYYY-MM-DDTHH:mm')}>${dayjs(dateTo).format('HH:MM')}</time>
+            <time class="event__end-time" datetime=${dayjs(dateTo).format(DateFormat.DATETIME_ATTRIBUTE)}>${dayjs(dateTo).format(DateFormat.HOUR_MINUTES)}</time>
           </p>
           <p class="event__duration">${getAbbreviatedFormat(duration)}</p>
         </div>
@@ -51,25 +52,25 @@ const createEventCardTemplate = ({type, dateFrom, dateTo, basePrice, isFavorite}
   );
 };
 
-export default class EventCardView {
-  constructor ({point, destination, offers}) {
-    this.point = point;
-    this.destination = destination;
-    this.offers = offers;
+export default class EventCardView extends AbstractView {
+  #point = null;
+  #destination = null;
+  #offers = null;
+  #rollupButtonClickHandler = null;
+  #favoriteButtonClickHandler = null;
+
+  constructor ({point, destination, offers, onRollupButtonClick}) {
+    super ();
+    this.#point = point;
+    this.#destination = destination;
+    this.#offers = offers;
+    this.#rollupButtonClickHandler = onRollupButtonClick;
+
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', (evt) => this.#rollupButtonClickHandler(evt));
   }
 
-  getTemplate () {
-    return createEventCardTemplate(this.point, this.destination, this.offers);
-  }
-
-  getElement () {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement () {
-    this.element = null;
+  get template () {
+    return createEventCardTemplate(this.#point, this.#destination, this.#offers);
   }
 }
