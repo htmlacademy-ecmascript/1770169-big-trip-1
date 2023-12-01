@@ -59,18 +59,30 @@ export default class EventCardView extends AbstractView {
   #rollupButtonClickHandler = null;
   #favoriteButtonClickHandler = null;
 
-  constructor ({point, destination, offers, onRollupButtonClick}) {
+  constructor (
+    {
+      point,
+      destination,
+      offers,
+      onRollupButtonClick,
+      onFavoriteButtonClick
+    }
+  ) {
     super ();
     this.#point = point;
     this.#destination = destination;
     this.#offers = offers;
     this.#rollupButtonClickHandler = onRollupButtonClick;
+    this.#favoriteButtonClickHandler = onFavoriteButtonClick;
 
     this.element.querySelector('.event__rollup-btn')
       .addEventListener('click', (evt) => this.#rollupButtonClickHandler(evt));
+    this.element.querySelector('.event__favorite-btn')
+      .addEventListener('click', this.#favoriteButtonClickHandler);
   }
 
   get template () {
     return createEventCardTemplate(this.#point, this.#destination, this.#offers);
   }
+
 }

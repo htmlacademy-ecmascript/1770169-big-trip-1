@@ -38,4 +38,6 @@ const getLastTwoWords = (text) => {
   return textArray.slice(textArray.length - 2).join('-');
 };
 
-export {toCapitalize, getDestinationNames, getPriceSum, getAbbreviatedFormat, getLastTwoWords};
+const updatePoints = (points, update) => points.map((point) => point.id === update.id ? update : point);
+
+export {toCapitalize, getDestinationNames, getPriceSum, getAbbreviatedFormat, getLastTwoWords, updatePoints};
