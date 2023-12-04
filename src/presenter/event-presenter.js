@@ -5,7 +5,8 @@ import FilterListView from '../view/filter-list-view';
 import InfoView from '../view/info-view';
 import SortListView from '../view/sort-list-view';
 import EventCardPresenter from './event-card-presenter';
-import { updatePoints } from '../utils';
+import {updatePoints, sortByPrice, sortByTime, sortByOffersLength, sortByEventName} from '../utils';
+import {SortType} from '../const.js';
 export default class EventPresenter {
   #filterValue = null;
   #eventListComponent = new EventListView();
@@ -19,6 +20,8 @@ export default class EventPresenter {
   #destinations = null;
   #offers = null;
   #eventCardPresenters = new Map();
+  #originalPoints = [];
+  #currentSortType = SortType.DAY;
 
   constructor (
     {
@@ -43,6 +46,7 @@ export default class EventPresenter {
     this.#destinations = this.#destinationsModel.destinations;
     this.#offers = this.#offersModel.offers;
     this.#renderEventElements();
+    this.#originalPoints = [...this.#points];
   }
 
   #renderEventElements () {
@@ -63,9 +67,7 @@ export default class EventPresenter {
       return;
     }
 
-    for (let i = 0; i < this.#points.length; i++) {
-      this.#renderEventCard(this.#points[i]);
-    }
+    this.#renderEventCards();
   }
 
   #renderInfoElement() {
@@ -88,7 +90,26 @@ export default class EventPresenter {
   }
 
   #renderSortElement () {
-    render(new SortListView(), this.#eventsContainer);
+    render(new SortListView({onFormClick: this.#formClickHandler}), this.#eventsContainer);
+  }
+
+  #sortEvents (sortType) {
+    switch (sortType) {
+      case SortType.EVENT:
+        this.#points.sort(sortByEventName);
+        break;
+      case SortType.TIME:
+        this.#points.sort(sortByTime);
+        break;
+      case SortType.PRICE:
+        this.#points.sort(sortByPrice);
+        break;
+      case SortType.OFFER:
+        this.#points.sort(sortByOffersLength);
+        break;
+      default:
+        this.#points = [...this.#originalPoints];
+    }
   }
 
   #renderEventListElement() {
@@ -97,6 +118,12 @@ export default class EventPresenter {
 
   #renderEmptyEventsMessageElement () {
     render(new EmptyEventsMessageView({filterType: this.#filterValue}), this.#eventsContainer);
+  }
+
+  #renderEventCards () {
+    for (let i = 0; i < this.#points.length; i++) {
+      this.#renderEventCard(this.#points[i]);
+    }
   }
 
   #renderEventCard (point) {
@@ -119,8 +146,24 @@ export default class EventPresenter {
     this.#eventCardPresenters.clear();
   }
 
+  #formClickHandler = (evt) => {
+    if (!evt.target.matches('.trip-sort__btn')) {
+      return;
+    }
+    const sortType = evt.target.dataset.type;
+
+    if (sortType === this.#currentSortType) {
+      return;
+    }
+    this.#sortEvents(sortType);
+    this.#clearEventCards();
+    this.#renderEventCards();
+    this.#currentSortType = sortType;
+  };
+
   #eventCardChangeHandler = (update) => {
     this.#points = updatePoints(this.#points, update);
+    this.#originalPoints = updatePoints(this.#points, update);
     this.#eventCardPresenters.get(update.id).init(update);
   };
 
