@@ -1,12 +1,11 @@
-import {RenderPosition, render, replace} from '../framework/render';
-import EventCardView from '../view/event-card-view';
-import EventEditView from '../view/event-edit-view';
+import {RenderPosition, render} from '../framework/render';
 import EventListView from '../view/event-list-view';
+import EmptyEventsMessageView from '../view/empty-events-message-view';
 import FilterListView from '../view/filter-list-view';
 import InfoView from '../view/info-view';
 import SortListView from '../view/sort-list-view';
-import {getDestinationNames} from '../utils';
-import EmptyEventsMessageView from '../view/empty-events-message-view';
+import EventCardPresenter from './event-card-presenter';
+import { updatePoints } from '../utils';
 export default class EventPresenter {
   #filterValue = null;
   #eventListComponent = new EventListView();
@@ -19,6 +18,7 @@ export default class EventPresenter {
   #points = null;
   #destinations = null;
   #offers = null;
+  #eventCardPresenters = new Map();
 
   constructor (
     {
@@ -38,37 +38,29 @@ export default class EventPresenter {
     this.#offersModel = offersModel;
   }
 
-  init () {
+  init() {
+    this.#points = this.#pointsModel.points;
+    this.#destinations = this.#destinationsModel.destinations;
+    this.#offers = this.#offersModel.offers;
     this.#renderEventElements();
   }
 
   #renderEventElements () {
-    this.#points = this.#pointsModel.points;
-    this.#destinations = this.#destinationsModel.destinations;
-    this.#offers = this.#offersModel.offers;
-    const filterChangeHandler = (evt) => {
-      if (evt.target.matches('.trip-filters__filter-input')) {
-        this.#filterValue = evt.target.value;
-      }
-    };
-
-    if (this.#points.length !== 0) {
-      render(new InfoView(
-        {
-          points: this.#points,
-          destinations: this.#destinations
-        }
-      ), this.#tripMainContainer, RenderPosition.AFTERBEGIN);
+    if (this.#points.length) {
+      this.#renderInfoElement();
     }
-    render(new FilterListView({onFilterChange: filterChangeHandler}), this.#filterContainer);
 
-    if (this.#points.length !== 0) {
-      render(new SortListView(), this.#eventsContainer);
+    this.#renderFilterElement();
+
+    if (this.#points.length) {
+      this.#renderSortElement();
     }
-    render(this.#eventListComponent, this.#eventsContainer);
 
-    if (this.#points.length === 0) {
-      return render(new EmptyEventsMessageView({filterType: this.#filterValue}), this.#eventsContainer);
+    this.#renderEventListElement();
+
+    if (!this.#points.length) {
+      this.#renderEmptyEventsMessageElement();
+      return;
     }
 
     for (let i = 0; i < this.#points.length; i++) {
@@ -76,66 +68,63 @@ export default class EventPresenter {
     }
   }
 
-  #renderEventCard (point) {
-    let isEventOpen = false;
-    const documentKeydownHandler = (evt) => {
-      if (evt.key === 'Escape') {
-        hideEventEdit();
-      }
-    };
-
-    const formSubmitHandler = () => {
-      hideEventEdit();
-    };
-
-    const rollupButtonClickHandler = () => {
-      if (isEventOpen) {
-        return hideEventEdit();
-      }
-      return showEventEdit();
-    };
-
-    function showEventEdit () {
-      replaceEventCard();
-      document.addEventListener('keydown', documentKeydownHandler);
-      isEventOpen = true;
-    }
-
-    function hideEventEdit () {
-      replaceEventEdit();
-      document.removeEventListener('keydown', documentKeydownHandler);
-      isEventOpen = false;
-    }
-
-    const eventCardComponent = new EventCardView(
+  #renderInfoElement() {
+    render(new InfoView(
       {
-        point: point,
-        destination: this.#destinationsModel._getDestinationsById(point.destination),
-        offers: this.#offersModel._getOfferItemsById(point.type, point.offers),
-        onRollupButtonClick: rollupButtonClickHandler
+        points: this.#points,
+        destinations: this.#destinations
       }
-    );
-
-    const eventEditComponent = new EventEditView(
-      {
-        point: point,
-        destination: this.#destinationsModel._getDestinationsById(point.destination),
-        availableCities: getDestinationNames(this.#destinations),
-        offers: this.#offersModel._getOffersByType(point.type),
-        checkedOffers: point.offers,
-        onFormSubmit: formSubmitHandler,
-        onRollupButtonClick: rollupButtonClickHandler
-      }
-    );
-
-    function replaceEventCard () {
-      replace(eventEditComponent, eventCardComponent);
-    }
-
-    function replaceEventEdit () {
-      replace(eventCardComponent, eventEditComponent);
-    }
-
-    render(eventCardComponent, this.#eventListComponent.element);
+    ), this.#tripMainContainer, RenderPosition.AFTERBEGIN);
   }
+
+  #renderFilterElement () {
+    const filterChangeHandler = (evt) => {
+      if (evt.target.matches('.trip-filters__filter-input')) {
+        this.#filterValue = evt.target.value;
+      }
+    };
+
+    render(new FilterListView({onFilterChange: filterChangeHandler}), this.#filterContainer);
+  }
+
+  #renderSortElement () {
+    render(new SortListView(), this.#eventsContainer);
+  }
+
+  #renderEventListElement() {
+    render(this.#eventListComponent, this.#eventsContainer);
+  }
+
+  #renderEmptyEventsMessageElement () {
+    render(new EmptyEventsMessageView({filterType: this.#filterValue}), this.#eventsContainer);
+  }
+
+  #renderEventCard (point) {
+    const eventCardPresenter = new EventCardPresenter(
+      {
+        destinationsModel: this.#destinationsModel,
+        offersModel: this.#offersModel,
+        eventListComponent: this.#eventListComponent,
+        onEventCardChange: this.#eventCardChangeHandler,
+        onEventCardReset: this.#eventCardResetHandler,
+      }
+    );
+    eventCardPresenter.init(point);
+
+    this.#eventCardPresenters.set(point.id, eventCardPresenter);
+  }
+
+  #clearEventCards () {
+    this.#eventCardPresenters.forEach((presenter) => presenter._removeComponent());
+    this.#eventCardPresenters.clear();
+  }
+
+  #eventCardChangeHandler = (update) => {
+    this.#points = updatePoints(this.#points, update);
+    this.#eventCardPresenters.get(update.id).init(update);
+  };
+
+  #eventCardResetHandler = () => {
+    this.#eventCardPresenters.forEach((presenter) => presenter._resetEventCard());
+  };
 }
