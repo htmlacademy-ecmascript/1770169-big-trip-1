@@ -5,7 +5,7 @@ import FilterListView from '../view/filter-list-view';
 import InfoView from '../view/info-view';
 import SortListView from '../view/sort-list-view';
 import EventCardPresenter from './event-card-presenter';
-import {updatePoints, sortByPrice, sortByTime, sortByOffersLength, sortByEventName} from '../utils';
+import {updatePoints, sortByPrice, sortByTime} from '../utils';
 import {SortType} from '../const.js';
 export default class EventPresenter {
   #filterValue = null;
@@ -95,20 +95,15 @@ export default class EventPresenter {
 
   #sortEvents (sortType) {
     switch (sortType) {
-      case SortType.EVENT:
-        this.#points.sort(sortByEventName);
-        break;
       case SortType.TIME:
         this.#points.sort(sortByTime);
         break;
       case SortType.PRICE:
         this.#points.sort(sortByPrice);
         break;
-      case SortType.OFFER:
-        this.#points.sort(sortByOffersLength);
-        break;
-      default:
+      case SortType.DAY:
         this.#points = [...this.#originalPoints];
+        break;
     }
   }
 

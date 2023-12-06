@@ -50,17 +50,7 @@ const sortByTime = (a, b) => {
   return secondPointDuration - firstPointDuration;
 };
 
-const sortByOffersLength = (a, b) => b.offers.length - a.offers.length;
-
-const sortByEventName = (a, b) => {
-  if (a.type > b.type) {
-    return 1;
-  }
-  if (a.type < b.type) {
-    return -1;
-  }
-  return 0;
-};
+const isEscape = (evt) => evt.key === 'Escape';
 
 export {
   toCapitalize,
@@ -71,6 +61,5 @@ export {
   updatePoints,
   sortByPrice,
   sortByTime,
-  sortByOffersLength,
-  sortByEventName
+  isEscape
 };

@@ -1,7 +1,7 @@
 import {render, replace, remove} from '../framework/render';
 import EventCardView from '../view/event-card-view';
 import EventEditView from '../view/event-edit-view';
-import {getDestinationNames} from '../utils';
+import {getDestinationNames, isEscape} from '../utils';
 
 export default class EventCardPresenter {
   #point = null;
@@ -107,7 +107,7 @@ export default class EventCardPresenter {
   }
 
   #documentKeydownHandler = (evt) => {
-    if (evt.key === 'Escape') {
+    if (isEscape(evt)) {
       this.#hideEventEdit();
     }
   };
