@@ -39,9 +39,9 @@ export default class EventCardPresenter {
 
     this.#eventCardComponent = new EventCardView(
       {
-        point: point,
-        destination: this.#destinationsModel._getDestinationsById(point.destination),
-        offers: this.#offersModel._getOfferItemsById(point.type, point.offers),
+        point: this.#point,
+        destination: this.#destinationsModel._getDestinationsById(this.#point.destination),
+        offers: this.#offersModel._getOfferItemsById(this.#point.type, this.#point.offers),
         onRollupButtonClick: this.#rollupButtonClickHandler,
         onFavoriteButtonClick: this.#favoriteButtonClickHandler
       }
@@ -49,13 +49,15 @@ export default class EventCardPresenter {
 
     this.#eventEditComponent = new EventEditView(
       {
-        point: point,
-        destination: this.#destinationsModel._getDestinationsById(point.destination),
+        point: this.#point,
+        destination: this.#destinationsModel._getDestinationsById(this.#point.destination),
         availableCities: getDestinationNames(this.#destinations),
-        offers: this.#offersModel._getOffersByType(point.type),
-        checkedOffers: point.offers,
+        offers: this.#offersModel._getOffersByType(this.#point.type),
+        checkedOffers: this.#point.offers,
         onFormSubmit: this.#formSubmitHandler,
-        onRollupButtonClick: this.#rollupButtonClickHandler
+        onRollupButtonClick: this.#rollupButtonClickHandler,
+        getDestination: this.#getDestination,
+        getOffers: this.#getOffers
       }
     );
 
@@ -103,6 +105,12 @@ export default class EventCardPresenter {
   _resetEventCard () {
     if (this.#eventStatus) {
       this.#replaceEventEdit();
+      this.#eventEditComponent.reset(
+        this.#point,
+        this.#destinationsModel._getDestinationsById(this.#point.destination),
+        this.#offersModel._getOffersByType(this.#point.type),
+        getDestinationNames(this.#destinations)
+      );
     }
   }
 
@@ -121,6 +129,10 @@ export default class EventCardPresenter {
     this.#replaceEventEdit();
     document.removeEventListener('keydown', this.#documentKeydownHandler);
   }
+
+  #getDestination = (name) => this.#destinationsModel._getDestinationsByName(name);
+
+  #getOffers = (type) => this.#offersModel._getOffersByType(type);
 
   #formSubmitHandler = (point) => {
     this.#hideEventEdit();
