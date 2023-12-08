@@ -105,12 +105,6 @@ export default class EventCardPresenter {
   _resetEventCard () {
     if (this.#eventStatus) {
       this.#replaceEventEdit();
-      this.#eventEditComponent.reset(
-        this.#point,
-        this.#destinationsModel._getDestinationsById(this.#point.destination),
-        this.#offersModel._getOffersByType(this.#point.type),
-        getDestinationNames(this.#destinations)
-      );
     }
   }
 
