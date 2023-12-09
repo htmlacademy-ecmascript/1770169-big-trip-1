@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import dayjs from 'dayjs';
 import {EVENT_TYPES, DEFAULT_POINT, DateFormat} from '../const.js';
 import {getLastTwoWords, toCapitalize} from '../utils';
@@ -10,7 +10,7 @@ const createTypeTemplate = (type) => (
   </div>`
 );
 
-const createHeaderTemplate = ({name}, availableCities, {type, dateFrom, dateTo, basePrice}) => (
+const createHeaderTemplate = (availableCities, {type, dateFrom, dateTo, basePrice, destination}) => (
   `<header class="event__header">
     <div class="event__type-wrapper">
       <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -31,9 +31,9 @@ const createHeaderTemplate = ({name}, availableCities, {type, dateFrom, dateTo, 
       <label class="event__label  event__type-output" for="event-destination-1">
         ${type}
       </label>
-      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value=${name} list="destination-list-1">
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value=${destination.name} list="destination-list-1">
       <datalist id="destination-list-1">
-        ${availableCities.map((city) => `<option value=${city}></option>`).join('')}
+        ${availableCities.map((city) => `<option value="${city}"></option>`).join('')}
       </datalist>
     </div>
 
@@ -61,13 +61,20 @@ const createHeaderTemplate = ({name}, availableCities, {type, dateFrom, dateTo, 
   </header>`
 );
 
-const createOfferTemplate = ({id, title, price}, checkedOffers) => {
+const createOfferTemplate = ({id, title, price, isChecked = ''}) => {
   const postfix = getLastTwoWords(title);
-  const checked = checkedOffers.includes(id) ? 'checked' : '';
 
   return (
     `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${postfix}-1" type="checkbox" name="event-offer-${postfix}" ${checked}>
+      <input
+        class="event__offer-checkbox
+        visually-hidden"
+        id="event-offer-${postfix}-1"
+        type="checkbox"
+        data-offer-id = ${id}
+        name="event-offer-${postfix}"
+        ${isChecked}
+      >
       <label class="event__offer-label" for="event-offer-${postfix}-1">
         <span class="event__offer-title">${title}</span>
         &plus;&euro;&nbsp;
@@ -77,11 +84,11 @@ const createOfferTemplate = ({id, title, price}, checkedOffers) => {
   );
 };
 
-const createOfferListTemplate = ({offers}, checkedOffers) => (
+const createOfferListTemplate = ({offers}) => (
   `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${offers.map((offer) => createOfferTemplate(offer, checkedOffers)).join('')}
+      ${offers.map((offer) => createOfferTemplate(offer)).join('')}
     </div>
   </section>`
 );
@@ -101,29 +108,26 @@ const createDestinationTemplate = ({description, pictures}) => (
   </section>`
 );
 
-const createEventDetailsTemplate = (destination, offers, checkedOffers) => (
+const createEventDetailsTemplate = ({destination, offers}) => (
   `<section class="event__details">
-    ${offers.offers.length !== 0 ? createOfferListTemplate(offers, checkedOffers) : ''}
+    ${offers.offers.length !== 0 ? createOfferListTemplate(offers) : ''}
     ${Object.keys(destination).length > 2 ? createDestinationTemplate(destination) : ''}
   </section>`
 );
 
 const createEventEditTemplate = (
   point,
-  destination,
-  availableCities,
-  offers,
-  checkedOffers
+  availableCities
 ) => (
   `<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
-      ${createHeaderTemplate(destination, availableCities, point)}
-      ${createEventDetailsTemplate(destination, offers, checkedOffers)}
+      ${createHeaderTemplate(availableCities, point)}
+      ${createEventDetailsTemplate(point)}
     </form>
   </li>`
 );
 
-export default class EventEditView extends AbstractView {
+export default class EventEditView extends AbstractStatefulView {
   #point = null;
   #destination = null;
   #availableCities = null;
@@ -131,6 +135,8 @@ export default class EventEditView extends AbstractView {
   #checkedOffers = null;
   #handleFormSubmit = null;
   #handleRollupButtonClick = null;
+  #getDestination = null;
+  #getOffers = null;
 
   constructor (
     {
@@ -140,7 +146,9 @@ export default class EventEditView extends AbstractView {
       offers = DEFAULT_POINT.offers,
       checkedOffers = [],
       onFormSubmit,
-      onRollupButtonClick
+      onRollupButtonClick,
+      getDestination,
+      getOffers
     }
   ) {
     super();
@@ -151,22 +159,88 @@ export default class EventEditView extends AbstractView {
     this.#checkedOffers = checkedOffers;
     this.#handleFormSubmit = onFormSubmit;
     this.#handleRollupButtonClick = onRollupButtonClick;
-    this.element.querySelector('.event--edit').addEventListener('submit', this.#formSubmitHandler);
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#handleRollupButtonClick);
+    this.#getDestination = getDestination;
+    this.#getOffers = getOffers;
+    this._setState(EventEditView.parsePointsToState(this.#point, this.#destination, this.#offers, this.#checkedOffers));
+    this._restoreHandlers();
   }
 
   get template () {
     return createEventEditTemplate(
-      this.#point,
-      this.#destination,
-      this.#availableCities,
-      this.#offers,
-      this.#checkedOffers
+      this._state,
+      this.#availableCities
     );
+  }
+
+  _restoreHandlers () {
+    this.element.querySelector('.event--edit').addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#handleRollupButtonClick);
+    this.element.querySelector('.event__type-list').addEventListener('click', this.#eventTypeClickHandler);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
+    this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#eventChangeHandler);
+  }
+
+  static parsePointsToState (points, destination, offer, checkedOffers) {
+    return {
+      ...points,
+      destination,
+      offers: {
+        ...offer,
+        offers: offer.offers.map((item) => ({...item, isChecked: checkedOffers.includes(item.id) ? 'checked' : ''}))
+      }
+    };
+  }
+
+  static parseStateToPoints (state) {
+    const points = {...state};
+    points.destination = points.destination.id;
+    points.offers = points.offers.offers.filter((offer) => offer.isChecked === 'checked').map((offer) => offer.id);
+
+    return points;
+  }
+
+  reset (point, destination, offers, checkedOffers) {
+    this.updateElement(EventEditView.parsePointsToState(point, destination, offers, checkedOffers));
   }
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(this.#point);
+    this.#handleFormSubmit(EventEditView.parseStateToPoints(this._state));
+  };
+
+  #eventTypeClickHandler = (evt) => {
+    if (evt.target.closest('.event__type-input')) {
+      const offers = this.#getOffers(evt.target.value);
+      this.updateElement(
+        {
+          type: evt.target.value,
+          offers,
+        }
+      );
+    }
+  };
+
+  #destinationChangeHandler = (evt) => {
+    const destination = this.#getDestination(evt.target.value);
+    this.updateElement({destination});
+  };
+
+  #eventChangeHandler = (evt) => {
+    if (evt.target.closest('.event__offer-selector')) {
+      const offerId = evt.target.dataset.offerId;
+
+      this._setState(
+        {
+          offers: {
+            ...this._state.offers,
+            offers: this._state.offers.offers.map(
+              (offer) => offer.id === offerId ?
+                {...offer, isChecked: offer.isChecked === 'checked' ? '' : 'checked'} :
+                offer
+            )
+          }
+        }
+      );
+    }
   };
 }
