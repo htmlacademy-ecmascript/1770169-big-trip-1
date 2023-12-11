@@ -1,7 +1,12 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 import {EVENT_TYPES, DEFAULT_POINT, DateFormat} from '../const.js';
 import {getLastTwoWords, toCapitalize} from '../utils';
+
+dayjs.extend(utc);
 
 const createTypeTemplate = (type) => (
   `<div class="event__type-item">
@@ -10,7 +15,7 @@ const createTypeTemplate = (type) => (
   </div>`
 );
 
-const createHeaderTemplate = (availableCities, {type, dateFrom, dateTo, basePrice, destination}) => (
+const createHeaderTemplate = (availableCities, {type, basePrice, destination}) => (
   `<header class="event__header">
     <div class="event__type-wrapper">
       <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -39,10 +44,10 @@ const createHeaderTemplate = (availableCities, {type, dateFrom, dateTo, basePric
 
     <div class="event__field-group  event__field-group--time">
       <label class="visually-hidden" for="event-start-time-1">From</label>
-      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value=${dayjs(dateFrom).format(DateFormat.DAY_MONTH_YEAR)}>
+      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time">
       &mdash;
       <label class="visually-hidden" for="event-end-time-1">To</label>
-      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value=${dayjs(dateTo).format(DateFormat.DAY_MONTH_YEAR)}>
+      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time">
     </div>
 
     <div class="event__field-group  event__field-group--price">
@@ -137,6 +142,8 @@ export default class EventEditView extends AbstractStatefulView {
   #handleRollupButtonClick = null;
   #getDestination = null;
   #getOffers = null;
+  #startDatepicker = null;
+  #endDatepicker = null;
 
   constructor (
     {
@@ -178,7 +185,39 @@ export default class EventEditView extends AbstractStatefulView {
     this.element.querySelector('.event__type-list').addEventListener('click', this.#eventTypeClickHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
     this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#eventChangeHandler);
+    this.element.querySelector('.event__input--price')?.addEventListener('change', this.#priceChangeHandler);
+    this.#initDatepicker();
   }
+
+  #initDatepicker () {
+    this.#startDatepicker = flatpickr(this.element.querySelector('#event-start-time-1'), {
+      dateFormat: DateFormat.DATE_PICKER,
+      defaultDate: this.#point.dateFrom,
+      onChange: this.#startDateChangeHandler
+    });
+
+    this.#endDatepicker = flatpickr(this.element.querySelector('#event-end-time-1'), {
+      dateFormat: DateFormat.DATE_PICKER,
+      defaultDate: this.#point.dateTo,
+      onChange: this.#endDateChangeHandler
+    });
+  }
+
+  #startDateChangeHandler = ([selectedDates]) => {
+    this._setState({dateFrom: dayjs.utc(selectedDates).format()});
+  };
+
+  #endDateChangeHandler = ([selectedDates]) => {
+    this._setState({dateTo: dayjs.utc(selectedDates).format()});
+  };
+
+  #priceChangeHandler = (evt) => {
+    const value = parseInt(evt.target.value, 10);
+    if (isNaN(value)) {
+      return;
+    }
+    this._setState({basePrice: value});
+  };
 
   static parsePointsToState (points, destination, offer, checkedOffers) {
     return {
@@ -199,8 +238,8 @@ export default class EventEditView extends AbstractStatefulView {
     return points;
   }
 
-  reset (point, destination, offers, checkedOffers) {
-    this.updateElement(EventEditView.parsePointsToState(point, destination, offers, checkedOffers));
+  reset () {
+    this.updateElement(EventEditView.parsePointsToState(this.#point, this.#destination, this.#offers, this.#checkedOffers));
   }
 
   #formSubmitHandler = (evt) => {
