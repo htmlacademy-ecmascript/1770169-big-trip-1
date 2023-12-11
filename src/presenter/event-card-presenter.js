@@ -89,12 +89,10 @@ export default class EventCardPresenter {
   #replaceEventCard () {
     replace(this.#eventEditComponent, this.#eventCardComponent);
     this.#eventCardResetHandler();
-    this.#eventStatus = true;
   }
 
   #replaceEventEdit () {
     replace(this.#eventCardComponent, this.#eventEditComponent);
-    this.#eventStatus = false;
   }
 
   _removeComponent () {
@@ -104,29 +102,32 @@ export default class EventCardPresenter {
 
   _resetEventCard () {
     if (this.#eventStatus) {
-      this.#replaceEventEdit();
+      this.#hideEventEdit();
     }
   }
+
+  #showEventEdit () {
+    this.#replaceEventCard();
+    document.addEventListener('keydown', this.#documentKeydownHandler);
+    this.#eventStatus = true;
+  }
+
+  #hideEventEdit () {
+    this.#eventEditComponent.reset();
+    this.#replaceEventEdit();
+    document.removeEventListener('keydown', this.#documentKeydownHandler);
+    this.#eventStatus = false;
+  }
+
+  #getDestination = (name) => this.#destinationsModel._getDestinationsByName(name);
+
+  #getOffers = (type) => this.#offersModel._getOffersByType(type);
 
   #documentKeydownHandler = (evt) => {
     if (isEscape(evt)) {
       this.#hideEventEdit();
     }
   };
-
-  #showEventEdit () {
-    this.#replaceEventCard();
-    document.addEventListener('keydown', this.#documentKeydownHandler);
-  }
-
-  #hideEventEdit () {
-    this.#replaceEventEdit();
-    document.removeEventListener('keydown', this.#documentKeydownHandler);
-  }
-
-  #getDestination = (name) => this.#destinationsModel._getDestinationsByName(name);
-
-  #getOffers = (type) => this.#offersModel._getOffersByType(type);
 
   #formSubmitHandler = (point) => {
     this.#hideEventEdit();

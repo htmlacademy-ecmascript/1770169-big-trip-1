@@ -78,7 +78,7 @@ const DateFormat = {
   MONTH: 'MMM',
   MONTH_DAY: 'MMM DD',
   HOUR_MINUTES: 'HH:MM',
-  DAY_MONTH_YEAR: 'DD/MM/YY[&nbsp;]HH:mm',
+  DATE_PICKER: 'd/m/y H:i',
   MINUTES_WITH_POSTFIX: 'mm[M]',
   HOUR_MINUTES_WITH_POSTFIX: 'HH[H] mm[M]',
   DAY_HOUR_MINUTES_WITH_POSTFIX: 'DD[D] HH[H] mm[M]'
