@@ -1,10 +1,17 @@
 import dayjs from 'dayjs';
 
-const FILTER_TYPE = {
-  everything: 'Click New Event to create your first point',
-  past: 'There are no past events now',
-  present: 'There are no present events now',
-  future: 'There are no future events now'
+const FilterTypes = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PRESENT: 'present',
+  PAST: 'past'
+};
+
+const EMPTY_MESSAGE_TYPE = {
+  [FilterTypes.EVERYTHING]: 'Click New Event to create your first point',
+  [FilterTypes.PAST]: 'There are no past events now',
+  [FilterTypes.PRESENT]: 'There are no present events now',
+  [FilterTypes.FUTURE]: 'There are no future events now'
 };
 
 const EVENT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
@@ -84,13 +91,6 @@ const DateFormat = {
   DAY_HOUR_MINUTES_WITH_POSTFIX: 'DD[D] HH[H] mm[M]'
 };
 
-const FilterTypes = {
-  EVERYTHING: 'everything',
-  FUTURE: 'future',
-  PRESENT: 'present',
-  PAST: 'past'
-};
-
 const SortType = {
   DAY: 'day',
   EVENT: 'event',
@@ -99,4 +99,4 @@ const SortType = {
   OFFER: 'offer'
 };
 
-export {FILTER_TYPE, EVENT_TYPES, DEFAULT_POINT, DateFormat, FilterTypes, SortType};
+export {EMPTY_MESSAGE_TYPE, EVENT_TYPES, DEFAULT_POINT, DateFormat, FilterTypes, SortType};
