@@ -99,4 +99,25 @@ const SortType = {
   OFFER: 'offer'
 };
 
-export {EMPTY_MESSAGE_TYPE, EVENT_TYPES, DEFAULT_POINT, DateFormat, FilterTypes, SortType};
+const ActionType = {
+  ADD_TASK: 'addTask',
+  UPDATE_TASK: 'updateTask',
+  DELETE_TASK: 'deleteTask'
+};
+
+const UpdateType = {
+  PATCH: 'patch',
+  MINOR: 'minor',
+  MAJOR: 'major'
+};
+
+export {
+  EMPTY_MESSAGE_TYPE,
+  EVENT_TYPES,
+  DEFAULT_POINT,
+  DateFormat,
+  FilterTypes,
+  SortType,
+  ActionType,
+  UpdateType
+};

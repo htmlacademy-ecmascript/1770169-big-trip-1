@@ -5,8 +5,8 @@ import FilterListView from '../view/filter-list-view';
 import InfoView from '../view/info-view';
 import SortListView from '../view/sort-list-view';
 import EventCardPresenter from './event-card-presenter';
-import {updatePoints, sortByPrice, sortByTime} from '../utils';
-import {SortType} from '../const.js';
+import {sortByPrice, sortByTime} from '../utils';
+import {ActionType, SortType, UpdateType} from '../const.js';
 export default class EventPresenter {
   #filterValue = null;
   #eventListComponent = new EventListView();
@@ -16,11 +16,7 @@ export default class EventPresenter {
   #pointsModel = null;
   #destinationsModel = null;
   #offersModel = null;
-  #points = null;
-  #destinations = null;
-  #offers = null;
   #eventCardPresenters = new Map();
-  #originalPoints = [];
   #currentSortType = SortType.DAY;
 
   constructor (
@@ -41,28 +37,40 @@ export default class EventPresenter {
     this.#offersModel = offersModel;
   }
 
+  get points () {
+    switch (this.#currentSortType) {
+      case SortType.TIME:
+        return [...this.#pointsModel.points].sort(sortByTime);
+      case SortType.PRICE:
+        return [...this.#pointsModel.points].sort(sortByPrice);
+    }
+    return this.#pointsModel.points;
+  }
+
+  get destinations () {
+    return this.#destinationsModel.destinations;
+  }
+
   init() {
-    this.#points = this.#pointsModel.points;
-    this.#destinations = this.#destinationsModel.destinations;
-    this.#offers = this.#offersModel.offers;
     this.#renderEventElements();
-    this.#originalPoints = [...this.#points];
   }
 
   #renderEventElements () {
-    if (this.#points.length) {
+    const count = this.points.length;
+
+    if (count) {
       this.#renderInfoElement();
     }
 
     this.#renderFilterElement();
 
-    if (this.#points.length) {
+    if (count) {
       this.#renderSortElement();
     }
 
     this.#renderEventListElement();
 
-    if (!this.#points.length) {
+    if (!count) {
       this.#renderEmptyEventsMessageElement();
       return;
     }
@@ -73,8 +81,8 @@ export default class EventPresenter {
   #renderInfoElement() {
     render(new InfoView(
       {
-        points: this.#points,
-        destinations: this.#destinations
+        points: this.points,
+        destinations: this.destinations
       }
     ), this.#tripMainContainer, RenderPosition.AFTERBEGIN);
   }
@@ -93,20 +101,6 @@ export default class EventPresenter {
     render(new SortListView({onFormClick: this.#formClickHandler}), this.#eventsContainer);
   }
 
-  #sortEvents (sortType) {
-    switch (sortType) {
-      case SortType.TIME:
-        this.#points.sort(sortByTime);
-        break;
-      case SortType.PRICE:
-        this.#points.sort(sortByPrice);
-        break;
-      case SortType.DAY:
-        this.#points = [...this.#originalPoints];
-        break;
-    }
-  }
-
   #renderEventListElement() {
     render(this.#eventListComponent, this.#eventsContainer);
   }
@@ -116,8 +110,8 @@ export default class EventPresenter {
   }
 
   #renderEventCards () {
-    for (let i = 0; i < this.#points.length; i++) {
-      this.#renderEventCard(this.#points[i]);
+    for (let i = 0; i < this.points.length; i++) {
+      this.#renderEventCard(this.points[i]);
     }
   }
 
@@ -141,6 +135,32 @@ export default class EventPresenter {
     this.#eventCardPresenters.clear();
   }
 
+  #handleViewAction (updateType, actionType, update) {
+    switch (actionType) {
+      case ActionType.ADD_TASK:
+        this.#pointsModel._addPoint(updateType, update);
+        break;
+      case ActionType.UPDATE_TASK:
+        this.#pointsModel._updatePoint(updateType, update);
+        break;
+      case ActionType.DELETE_TASK:
+        this.#pointsModel._deletePoint(updateType, update);
+        break;
+    }
+  }
+
+  #handleModelEvent (updateType, update) {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#eventCardPresenters.get(update.id).init(update);
+        break;
+      case UpdateType.MINOR:
+        break;
+      case UpdateType.MAJOR:
+        break;
+    }
+  }
+
   #formClickHandler = (evt) => {
     if (!evt.target.matches('.trip-sort__btn')) {
       return;
@@ -150,15 +170,12 @@ export default class EventPresenter {
     if (sortType === this.#currentSortType) {
       return;
     }
-    this.#sortEvents(sortType);
     this.#clearEventCards();
     this.#renderEventCards();
     this.#currentSortType = sortType;
   };
 
   #eventCardChangeHandler = (update) => {
-    this.#points = updatePoints(this.#points, update);
-    this.#originalPoints = updatePoints(this.#points, update);
     this.#eventCardPresenters.get(update.id).init(update);
   };
 

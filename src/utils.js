@@ -40,8 +40,6 @@ const getLastTwoWords = (text) => {
   return textArray.slice(textArray.length - 2).join('-');
 };
 
-const updatePoints = (points, update) => points.map((point) => point.id === update.id ? update : point);
-
 const sortByPrice = (a, b) => b.basePrice - a.basePrice;
 
 const sortByTime = (a, b) => {
@@ -58,7 +56,6 @@ export {
   getPriceSum,
   getAbbreviatedFormat,
   getLastTwoWords,
-  updatePoints,
   sortByPrice,
   sortByTime,
   isEscape
