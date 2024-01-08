@@ -1,6 +1,4 @@
-import dayjs from 'dayjs';
-
-const FilterTypes = {
+const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
   PRESENT: 'present',
@@ -8,75 +6,22 @@ const FilterTypes = {
 };
 
 const EMPTY_MESSAGE_TYPE = {
-  [FilterTypes.EVERYTHING]: 'Click New Event to create your first point',
-  [FilterTypes.PAST]: 'There are no past events now',
-  [FilterTypes.PRESENT]: 'There are no present events now',
-  [FilterTypes.FUTURE]: 'There are no future events now'
+  [FilterType.EVERYTHING]: 'Click New Event to create your first point',
+  [FilterType.PAST]: 'There are no past events now',
+  [FilterType.PRESENT]: 'There are no present events now',
+  [FilterType.FUTURE]: 'There are no future events now'
 };
 
 const EVENT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
-const DEFAULT_OFFERS = {
-  type: 'taxi',
-  offers: [
-    {
-      title: 'Upgrade to a business class',
-      price: 190
-    },
-    {
-      title: 'Choose the radio station',
-      price: 30
-    },
-    {
-      title: 'Choose temperature',
-      price: 170
-    },
-    {
-      title: 'Drive quickly, I\'m in a hurry',
-      price: 100
-    },
-    {
-      title: 'Drive slowly',
-      price: 110
-    }
-  ]
-};
-
-const DEFAULT_DESTINATION = {
-  name: 'Chamonix',
-  description: 'Chamonix, is a beautiful city, a true asian pearl, with a beautiful old town.',
-  pictures: [
-    {
-      src: 'https://20.ecmascript.pages.academy/static/destinations/4.jpg',
-      description: 'Chamonix embankment'
-    },
-    {
-      src: 'https://20.ecmascript.pages.academy/static/destinations/8.jpg',
-      description: 'Chamonix park'
-    },
-    {
-      src: 'https://20.ecmascript.pages.academy/static/destinations/15.jpg',
-      description: 'Chamonix kindergarten'
-    },
-    {
-      src: 'https://20.ecmascript.pages.academy/static/destinations/16.jpg',
-      description: 'Chamonix biggest supermarket'
-    },
-    {
-      src: 'https://20.ecmascript.pages.academy/static/destinations/19.jpg',
-      description: 'Chamonix street market'
-    }
-  ]
-};
-
 const DEFAULT_POINT = {
   type: 'taxi',
-  dateFrom: dayjs(),
-  dateTo: dayjs().hour(1),
-  destination: DEFAULT_DESTINATION,
-  basePrice: 10,
+  dateFrom: null,
+  dateTo: null,
+  destination: {name: ''},
+  basePrice: '',
   isFavorite: false,
-  offers: DEFAULT_OFFERS
+  offers: {offers: []}
 };
 
 const DateFormat = {
@@ -100,9 +45,9 @@ const SortType = {
 };
 
 const ActionType = {
-  ADD_TASK: 'addTask',
-  UPDATE_TASK: 'updateTask',
-  DELETE_TASK: 'deleteTask'
+  ADD_POINT: 'addPoint',
+  UPDATE_POINT: 'updatePoint',
+  DELETE_POINT: 'deletePoint'
 };
 
 const UpdateType = {
@@ -116,7 +61,7 @@ export {
   EVENT_TYPES,
   DEFAULT_POINT,
   DateFormat,
-  FilterTypes,
+  FilterType,
   SortType,
   ActionType,
   UpdateType

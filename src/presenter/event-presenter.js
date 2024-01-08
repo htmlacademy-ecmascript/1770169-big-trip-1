@@ -1,53 +1,77 @@
-import {RenderPosition, render} from '../framework/render';
-import EventListView from '../view/event-list-view';
-import EmptyEventsMessageView from '../view/empty-events-message-view';
-import FilterListView from '../view/filter-list-view';
-import InfoView from '../view/info-view';
-import SortListView from '../view/sort-list-view';
-import EventCardPresenter from './event-card-presenter';
-import {sortByPrice, sortByTime} from '../utils';
-import {ActionType, SortType, UpdateType} from '../const.js';
+import {RenderPosition, render, remove} from '../framework/render.js';
+import EventListView from '../view/event-list-view.js';
+import EmptyEventsMessageView from '../view/empty-events-message-view.js';
+import InfoView from '../view/info-view.js';
+import SortListView from '../view/sort-list-view.js';
+import EventCardPresenter from './event-card-presenter.js';
+import {sortByPrice, sortByTime} from '../utils/utils.js';
+import {filter} from '../utils/filter.js';
+import {ActionType, SortType, UpdateType, FilterType} from '../const.js';
+import NewEventCardPresenter from './new-event-card-presenter.js';
 export default class EventPresenter {
-  #filterValue = null;
   #eventListComponent = new EventListView();
+  #emptyEventsMessageComponent = null;
+  #sortComponent = null;
+  #infoComponent = null;
   #tripMainContainer = null;
-  #filterContainer = null;
   #eventsContainer = null;
+  #newEventCardPresenter = null;
   #pointsModel = null;
   #destinationsModel = null;
   #offersModel = null;
+  #filterModel = null;
   #eventCardPresenters = new Map();
   #currentSortType = SortType.DAY;
+  #currentFilterType = null;
 
   constructor (
     {
       tripMainContainer,
-      filterContainer,
       eventsContainer,
       pointsModel,
       destinationsModel,
-      offersModel
+      offersModel,
+      filterModel,
+      onCloseClick
     }
   ) {
     this.#tripMainContainer = tripMainContainer;
-    this.#filterContainer = filterContainer;
     this.#eventsContainer = eventsContainer;
     this.#pointsModel = pointsModel;
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
+    this.#filterModel = filterModel;
+
+    this.#newEventCardPresenter = new NewEventCardPresenter(
+      {
+        destinationsModel: this.#destinationsModel,
+        offersModel: this.#offersModel,
+        eventListContainer: this.#eventListComponent,
+        getDestination: this.#getDestination,
+        getOffers: this.#getOffers,
+        onEventCardChange: this.#handleViewAction,
+        onCloseClick
+      }
+    );
+
+    this.#pointsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  get points () {
+  get points() {
+    const points = [...this.#pointsModel.points];
+    this.#currentFilterType = this.#filterModel.filter;
+    const filteredPoints = filter[this.#currentFilterType](points);
     switch (this.#currentSortType) {
       case SortType.TIME:
-        return [...this.#pointsModel.points].sort(sortByTime);
+        return filteredPoints.sort(sortByTime);
       case SortType.PRICE:
-        return [...this.#pointsModel.points].sort(sortByPrice);
+        return filteredPoints.sort(sortByPrice);
     }
-    return this.#pointsModel.points;
+    return filteredPoints;
   }
 
-  get destinations () {
+  get destinations() {
     return this.#destinationsModel.destinations;
   }
 
@@ -55,74 +79,49 @@ export default class EventPresenter {
     this.#renderEventElements();
   }
 
-  #renderEventElements () {
-    const count = this.points.length;
-
-    if (count) {
-      this.#renderInfoElement();
-    }
-
-    this.#renderFilterElement();
-
-    if (count) {
-      this.#renderSortElement();
-    }
-
-    this.#renderEventListElement();
-
-    if (!count) {
-      this.#renderEmptyEventsMessageElement();
-      return;
-    }
-
-    this.#renderEventCards();
-  }
-
   #renderInfoElement() {
-    render(new InfoView(
+    this.#infoComponent = new InfoView(
       {
         points: this.points,
         destinations: this.destinations
       }
-    ), this.#tripMainContainer, RenderPosition.AFTERBEGIN);
+    );
+    render(this.#infoComponent, this.#tripMainContainer, RenderPosition.AFTERBEGIN);
   }
 
-  #renderFilterElement () {
-    const filterChangeHandler = (evt) => {
-      if (evt.target.matches('.trip-filters__filter-input')) {
-        this.#filterValue = evt.target.value;
+  #renderSortElement() {
+    this.#sortComponent = new SortListView(
+      {
+        currentSortType: this.#currentSortType,
+        onFormClick: this.#sortFormClickHandler
       }
-    };
-
-    render(new FilterListView({onFilterChange: filterChangeHandler}), this.#filterContainer);
-  }
-
-  #renderSortElement () {
-    render(new SortListView({onFormClick: this.#formClickHandler}), this.#eventsContainer);
+    );
+    render(this.#sortComponent, this.#eventsContainer);
   }
 
   #renderEventListElement() {
     render(this.#eventListComponent, this.#eventsContainer);
   }
 
-  #renderEmptyEventsMessageElement () {
-    render(new EmptyEventsMessageView({filterType: this.#filterValue}), this.#eventsContainer);
+  #renderEmptyEventsMessageElement() {
+    this.#emptyEventsMessageComponent = new EmptyEventsMessageView({currentFilterType: this.#currentFilterType});
+    render(this.#emptyEventsMessageComponent, this.#eventsContainer);
   }
 
-  #renderEventCards () {
-    for (let i = 0; i < this.points.length; i++) {
-      this.#renderEventCard(this.points[i]);
-    }
+  #renderEventCards() {
+    this.points.forEach((point) => this.#renderEventCard(point));
   }
 
-  #renderEventCard (point) {
+  #renderEventCard(point) {
     const eventCardPresenter = new EventCardPresenter(
       {
         destinationsModel: this.#destinationsModel,
         offersModel: this.#offersModel,
-        eventListComponent: this.#eventListComponent,
-        onEventCardChange: this.#eventCardChangeHandler,
-        onEventCardReset: this.#eventCardResetHandler,
+        eventListContainer: this.#eventListComponent,
+        getDestination: this.#getDestination,
+        getOffers: this.#getOffers,
+        onEventCardChange: this.#handleViewAction,
+        onEventCardReset: this.#eventCardResetHandler
       }
     );
     eventCardPresenter.init(point);
@@ -130,38 +129,84 @@ export default class EventPresenter {
     this.#eventCardPresenters.set(point.id, eventCardPresenter);
   }
 
-  #clearEventCards () {
-    this.#eventCardPresenters.forEach((presenter) => presenter._removeComponent());
-    this.#eventCardPresenters.clear();
+  #renderEventElements() {
+    const isNotEmpty = !!this.points.length;
+
+    if (isNotEmpty) {
+      this.#renderInfoElement();
+      this.#renderSortElement();
+    }
+
+    this.#renderEventListElement();
+
+    if (!isNotEmpty) {
+      this.#renderEmptyEventsMessageElement();
+      return;
+    }
+
+    this.#renderEventCards();
   }
 
-  #handleViewAction (updateType, actionType, update) {
-    switch (actionType) {
-      case ActionType.ADD_TASK:
-        this.#pointsModel._addPoint(updateType, update);
-        break;
-      case ActionType.UPDATE_TASK:
-        this.#pointsModel._updatePoint(updateType, update);
-        break;
-      case ActionType.DELETE_TASK:
-        this.#pointsModel._deletePoint(updateType, update);
-        break;
+  createNewPoint() {
+    this.#filterModel.filter = {
+      updateType: UpdateType.MAJOR,
+      filterType: FilterType.EVERYTHING
+    };
+    this.#newEventCardPresenter.init();
+  }
+
+  #clearEventElements({resetSortType = false} = {}) {
+    this.#eventCardPresenters.forEach((presenter) => presenter._removeComponent());
+    this.#eventCardPresenters.clear();
+    this.#newEventCardPresenter.close();
+
+    remove(this.#infoComponent);
+    remove(this.#sortComponent);
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DAY;
+    }
+
+    if (this.#emptyEventsMessageComponent) {
+      remove(this.#emptyEventsMessageComponent);
     }
   }
 
-  #handleModelEvent (updateType, update) {
+  #getDestination = (name) => this.#destinationsModel._getDestinationsByName(name);
+
+  #getOffers = (type) => this.#offersModel._getOffersByType(type);
+
+  #handleViewAction = (actionType, updateType, update) => {
+    switch (actionType) {
+      case ActionType.ADD_POINT:
+        this.#pointsModel._addPoint(updateType, update);
+        break;
+      case ActionType.UPDATE_POINT:
+        this.#pointsModel._updatePoint(updateType, update);
+        break;
+      case ActionType.DELETE_POINT:
+        this.#pointsModel._deletePoint(updateType, update);
+        break;
+    }
+  };
+
+  #handleModelEvent = (updateType, update) => {
     switch (updateType) {
       case UpdateType.PATCH:
         this.#eventCardPresenters.get(update.id).init(update);
         break;
       case UpdateType.MINOR:
+        this.#clearEventElements();
+        this.#renderEventElements();
         break;
       case UpdateType.MAJOR:
+        this.#clearEventElements({resetSortType: true});
+        this.#renderEventElements();
         break;
     }
-  }
+  };
 
-  #formClickHandler = (evt) => {
+  #sortFormClickHandler = (evt) => {
     if (!evt.target.matches('.trip-sort__btn')) {
       return;
     }
@@ -170,16 +215,13 @@ export default class EventPresenter {
     if (sortType === this.#currentSortType) {
       return;
     }
-    this.#clearEventCards();
-    this.#renderEventCards();
     this.#currentSortType = sortType;
-  };
-
-  #eventCardChangeHandler = (update) => {
-    this.#eventCardPresenters.get(update.id).init(update);
+    this.#clearEventElements();
+    this.#renderEventElements();
   };
 
   #eventCardResetHandler = () => {
     this.#eventCardPresenters.forEach((presenter) => presenter._resetEventCard());
+    this.#newEventCardPresenter.close();
   };
 }

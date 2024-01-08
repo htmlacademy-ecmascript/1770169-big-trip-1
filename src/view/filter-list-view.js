@@ -1,8 +1,8 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {FilterTypes} from '../const.js';
+import {FilterType} from '../const.js';
 
-const createFilterTemplate = (filterType) => {
-  const checked = filterType === FilterTypes.EVERYTHING ? 'checked' : '';
+const createFilterTemplate = (filterType, currentFilterType) => {
+  const checked = filterType === currentFilterType ? 'checked' : '';
 
   return (
     `<div class="trip-filters__filter">
@@ -12,20 +12,22 @@ const createFilterTemplate = (filterType) => {
   );
 };
 
-const createFilterListTemplate = () => (
+const createFilterListTemplate = (currentFilterType) => (
   `<form class="trip-filters" action="#" method="get">
-    ${Object.values(FilterTypes).map((item) => createFilterTemplate(item)).join('')}
+    ${Object.values(FilterType).map((item) => createFilterTemplate(item, currentFilterType)).join('')}
     <button class="visually-hidden" type="submit">Accept filter</button>
   </form>`
 );
 
 export default class FilterListView extends AbstractView {
-  constructor ({onFilterChange}) {
+  #currentFilterType;
+  constructor ({currentFilterType, onFilterChange}) {
     super();
+    this.#currentFilterType = currentFilterType;
     this.element.addEventListener('change', onFilterChange);
   }
 
   get template () {
-    return createFilterListTemplate();
+    return createFilterListTemplate(this.#currentFilterType);
   }
 }
