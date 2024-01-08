@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
-import {toCapitalize, getAbbreviatedFormat} from '../utils.js';
+import {toCapitalize, getAbbreviatedFormat} from '../utils/utils.js';
 import {DateFormat} from '../const.js';
 
 const createOfferTemplate = ({title, price}) => (

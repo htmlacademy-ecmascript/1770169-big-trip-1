@@ -1,16 +1,20 @@
 import {render, replace, remove} from '../framework/render';
 import EventCardView from '../view/event-card-view';
 import EventEditView from '../view/event-edit-view';
-import {getDestinationNames, isEscape} from '../utils';
+import {getDestinationNames, isEscape} from '../utils/utils';
+import {ActionType, UpdateType} from '../const';
+import dayjs from 'dayjs';
 
 export default class EventCardPresenter {
   #point = null;
   #destinations = null;
   #destinationsModel = null;
   #offersModel = null;
-  #eventListComponent = null;
+  #eventListContainer = null;
   #eventCardComponent = null;
   #eventEditComponent = null;
+  #getDestination = null;
+  #getOffers = null;
   #eventCardChangeHandler = null;
   #eventCardResetHandler = null;
   #isEventOpen = false;
@@ -19,14 +23,18 @@ export default class EventCardPresenter {
     {
       destinationsModel,
       offersModel,
-      eventListComponent,
+      eventListContainer,
+      getDestination,
+      getOffers,
       onEventCardChange,
       onEventCardReset
     }
   ) {
     this.#destinationsModel = destinationsModel;
     this.#offersModel = offersModel;
-    this.#eventListComponent = eventListComponent;
+    this.#eventListContainer = eventListContainer;
+    this.#getDestination = getDestination;
+    this.#getOffers = getOffers;
     this.#eventCardChangeHandler = onEventCardChange;
     this.#eventCardResetHandler = onEventCardReset;
   }
@@ -54,15 +62,16 @@ export default class EventCardPresenter {
         availableCities: getDestinationNames(this.#destinations),
         offers: this.#offersModel._getOffersByType(this.#point.type),
         checkedOffers: this.#point.offers,
-        onFormSubmit: this.#formSubmitHandler,
-        onRollupButtonClick: this.#rollupButtonClickHandler,
         getDestination: this.#getDestination,
-        getOffers: this.#getOffers
+        getOffers: this.#getOffers,
+        onFormSubmit: this.#formSubmitHandler,
+        onFormReset: this.#formResetHandler,
+        onRollupButtonClick: this.#rollupButtonClickHandler,
       }
     );
 
     if (prevEventCardComponent === null || prevEventEditComponent === null) {
-      render(this.#eventCardComponent, this.#eventListComponent.element);
+      render(this.#eventCardComponent, this.#eventListContainer.element);
       return;
     }
 
@@ -119,10 +128,6 @@ export default class EventCardPresenter {
     this.#eventStatus = false;
   }
 
-  #getDestination = (name) => this.#destinationsModel._getDestinationsByName(name);
-
-  #getOffers = (type) => this.#offersModel._getOffersByType(type);
-
   #documentKeydownHandler = (evt) => {
     if (isEscape(evt)) {
       this.#hideEventEdit();
@@ -131,7 +136,23 @@ export default class EventCardPresenter {
 
   #formSubmitHandler = (point) => {
     this.#hideEventEdit();
-    this.#eventCardChangeHandler(point);
+    const currentDuration = dayjs(point.dateTo).diff(point.dateFrom);
+    const prevDuration = dayjs(this.#point.dateTo).diff(this.#point.dateFrom);
+    const isMinorUpdate = point.basePrice !== this.#point.basePrice || currentDuration !== prevDuration;
+
+    this.#eventCardChangeHandler(
+      ActionType.UPDATE_POINT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      point
+    );
+  };
+
+  #formResetHandler = () => {
+    this.#eventCardChangeHandler(
+      ActionType.DELETE_POINT,
+      UpdateType.MINOR,
+      this.#point
+    );
   };
 
   #rollupButtonClickHandler = () => {
@@ -142,6 +163,10 @@ export default class EventCardPresenter {
   };
 
   #favoriteButtonClickHandler = () => {
-    this.#eventCardChangeHandler({...this.#point, isFavorite: !this.#point.isFavorite});
+    this.#eventCardChangeHandler(
+      ActionType.UPDATE_POINT,
+      UpdateType.PATCH,
+      {...this.#point, isFavorite: !this.#point.isFavorite}
+    );
   };
 }

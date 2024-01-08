@@ -2,8 +2,8 @@ const points = [
   {
     id: '0720960e-14c2-4a2f-81f0-8a6dcb6d020d',
     type: 'check-in',
-    dateFrom: '2023-11-14T05:04:05.328Z',
-    dateTo: '2023-11-14T21:10:28.455Z',
+    dateFrom: '2023-12-24T05:04:05.328Z',
+    dateTo: '2023-12-24T21:10:28.455Z',
     destination: '6770541a-d429-4c1b-b1de-2a3167214777',
     basePrice: 700,
     isFavorite: false,
@@ -17,8 +17,8 @@ const points = [
   {
     id: '4447a921-4ea7-4b8c-82a4-b017f20cfdd4',
     type: 'sightseeing',
-    dateFrom: '2023-11-14T21:10:28.455Z',
-    dateTo: '2023-11-15T20:14:42.774Z',
+    dateFrom: '2023-12-25T21:10:28.455Z',
+    dateTo: '2023-12-26T20:14:42.774Z',
     destination: 'a956955a-4b89-4deb-b437-977a20d600a9',
     basePrice: 1000,
     isFavorite: false,
@@ -27,8 +27,8 @@ const points = [
   {
     id: '13f56552-c663-4276-84ca-128e0842c706',
     type: 'flight',
-    dateFrom: '2023-11-15T20:14:42.774Z',
-    dateTo: '2023-11-16T19:30:13.613Z',
+    dateFrom: '2023-12-20T20:14:42.774Z',
+    dateTo: '2023-12-24T19:30:13.613Z',
     destination: 'd8674ae4-c784-4996-9f7d-97d73868037e',
     basePrice: 900,
     isFavorite: false,
