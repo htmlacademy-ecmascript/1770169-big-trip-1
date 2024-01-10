@@ -1,23 +1,39 @@
-import {points} from '../mock/points.js';
+import {UpdateType} from '../const.js';
 import Observable from '../framework/observable.js';
 
 export default class PointsModel extends Observable {
-  #points = points;
+  #pointApiService = null;
+  #points = [];
 
-  get points () {
+  constructor({pointApiService}) {
+    super();
+    this.#pointApiService = pointApiService;
+  }
+
+  async init() {
+    try {
+      this.#points = await this.#pointApiService.points;
+    } catch(err) {
+      this.#points = [];
+    }
+
+    this._notify(UpdateType.INIT);
+  }
+
+  get points() {
     return this.#points;
   }
 
-  _getPointById (id) {
+  _getPointById(id) {
     return this.#points.find((point) => point.id === id);
   }
 
-  _addPoint (updateType, update) {
+  _addPoint(updateType, update) {
     this.#points = [update, ...this.#points];
     this._notify(updateType, update);
   }
 
-  _updatePoint (updateType, update) {
+  _updatePoint(updateType, update) {
     const index = this.#points.findIndex((point) => point.id === update.id);
 
     if (index === -1) {
@@ -28,7 +44,7 @@ export default class PointsModel extends Observable {
     this._notify(updateType, update);
   }
 
-  _deletePoint (updateType, update) {
+  _deletePoint(updateType, update) {
     const index = this.#points.findIndex((point) => point.id === update.id);
 
     if (index === -1) {

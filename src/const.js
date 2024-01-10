@@ -53,7 +53,24 @@ const ActionType = {
 const UpdateType = {
   PATCH: 'patch',
   MINOR: 'minor',
-  MAJOR: 'major'
+  MAJOR: 'major',
+  INIT: 'init'
+};
+
+const API_URL = 'https://20.ecmascript.pages.academy/big-trip';
+const AUTH_TOKEN = 'Basic wGtu7hacTxK0W9au';
+
+const Path = {
+  POINTS: 'points',
+  OFFERS: 'offers',
+  DESTINATIONS: 'destinations'
+};
+
+const Method = {
+  POST: 'post',
+  PUT: 'put',
+  DELETE: 'delete'
+
 };
 
 export {
@@ -64,5 +81,9 @@ export {
   FilterType,
   SortType,
   ActionType,
-  UpdateType
+  UpdateType,
+  Path,
+  Method,
+  API_URL,
+  AUTH_TOKEN
 };

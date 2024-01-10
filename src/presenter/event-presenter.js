@@ -1,15 +1,17 @@
-import {RenderPosition, render, remove} from '../framework/render.js';
 import EventListView from '../view/event-list-view.js';
 import EmptyEventsMessageView from '../view/empty-events-message-view.js';
 import InfoView from '../view/info-view.js';
+import LoadingView from '../view/loading-view.js';
 import SortListView from '../view/sort-list-view.js';
 import EventCardPresenter from './event-card-presenter.js';
+import NewEventCardPresenter from './new-event-card-presenter.js';
+import {RenderPosition, render, remove} from '../framework/render.js';
 import {sortByPrice, sortByTime} from '../utils/utils.js';
 import {filter} from '../utils/filter.js';
 import {ActionType, SortType, UpdateType, FilterType} from '../const.js';
-import NewEventCardPresenter from './new-event-card-presenter.js';
 export default class EventPresenter {
   #eventListComponent = new EventListView();
+  #loadingComponent = new LoadingView();
   #emptyEventsMessageComponent = null;
   #sortComponent = null;
   #infoComponent = null;
@@ -23,6 +25,7 @@ export default class EventPresenter {
   #eventCardPresenters = new Map();
   #currentSortType = SortType.DAY;
   #currentFilterType = null;
+  #isLoading = true;
 
   constructor (
     {
@@ -105,6 +108,10 @@ export default class EventPresenter {
     render(this.#eventListComponent, this.#eventsContainer);
   }
 
+  #renderLoader() {
+    render(this.#loadingComponent, this.#eventsContainer);
+  }
+
   #renderEmptyEventsMessageElement() {
     this.#emptyEventsMessageComponent = new EmptyEventsMessageView({currentFilterType: this.#currentFilterType});
     render(this.#emptyEventsMessageComponent, this.#eventsContainer);
@@ -133,6 +140,11 @@ export default class EventPresenter {
 
   #renderEventElements() {
     const isNotEmpty = !!this.points.length;
+
+    if (this.#isLoading) {
+      this.#renderLoader();
+      return;
+    }
 
     if (isNotEmpty) {
       this.#renderInfoElement();
@@ -164,6 +176,7 @@ export default class EventPresenter {
 
     remove(this.#infoComponent);
     remove(this.#sortComponent);
+    remove(this.#loadingComponent);
 
     if (resetSortType) {
       this.#currentSortType = SortType.DAY;
@@ -203,6 +216,11 @@ export default class EventPresenter {
         break;
       case UpdateType.MAJOR:
         this.#clearEventElements({resetSortType: true});
+        this.#renderEventElements();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
         this.#renderEventElements();
         break;
     }
