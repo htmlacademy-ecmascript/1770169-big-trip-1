@@ -62,13 +62,15 @@ export default class EventPresenter {
     const points = [...this.#pointsModel.points];
     this.#currentFilterType = this.#filterModel.filter;
     const filteredPoints = filter[this.#currentFilterType](points);
+
     switch (this.#currentSortType) {
       case SortType.TIME:
         return filteredPoints.sort(sortByTime);
       case SortType.PRICE:
         return filteredPoints.sort(sortByPrice);
+      default:
+        return filteredPoints;
     }
-    return filteredPoints;
   }
 
   get destinations() {
@@ -212,7 +214,7 @@ export default class EventPresenter {
     }
     const sortType = evt.target.dataset.type;
 
-    if (sortType === this.#currentSortType) {
+    if (sortType === this.#currentSortType || sortType === SortType.EVENT || sortType === SortType.OFFER) {
       return;
     }
     this.#currentSortType = sortType;
