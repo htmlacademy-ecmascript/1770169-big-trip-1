@@ -15,9 +15,15 @@ const tripMainElement = document.querySelector('.trip-main');
 const filtersElement = tripMainElement.querySelector('.trip-controls__filters');
 const eventsElement = document.querySelector('.trip-events');
 
-const pointsModel = new PointsModel({pointApiService: new PointApiService(API_URL, AUTH_TOKEN)});
 const destinationsModel = new DestinationsModel({destinationsApiService: new DestinationsApiService(API_URL, AUTH_TOKEN)});
 const offersModel = new OffersModel({offersApiService: new OffersApiService(API_URL, AUTH_TOKEN)});
+const pointsModel = new PointsModel(
+  {
+    pointApiService: new PointApiService(API_URL, AUTH_TOKEN),
+    destinationsModel,
+    offersModel,
+  }
+);
 const filterModel = new FilterModel();
 const eventPresenter = new EventPresenter(
   {
@@ -48,11 +54,9 @@ function newEventCardCloseHandler () {
   newEventButtonComponent.element.disabled = false;
 }
 
-filterPresenter.init();
-eventPresenter.init();
-destinationsModel.init();
-offersModel.init();
-pointsModel.init();
 
+pointsModel.init();
+eventPresenter.init();
+filterPresenter.init();
 
 render(newEventButtonComponent, tripMainElement);

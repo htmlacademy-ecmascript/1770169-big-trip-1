@@ -194,7 +194,7 @@ export default class EventPresenter {
   #handleViewAction = (actionType, updateType, update) => {
     switch (actionType) {
       case ActionType.ADD_POINT:
-        this.#pointsModel._addPoint(updateType, update);
+        this.#pointsModel._createPoint(updateType, update);
         break;
       case ActionType.UPDATE_POINT:
         this.#pointsModel._updatePoint(updateType, update);
@@ -221,6 +221,7 @@ export default class EventPresenter {
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
+        this.#clearEventElements();
         this.#renderEventElements();
         break;
     }

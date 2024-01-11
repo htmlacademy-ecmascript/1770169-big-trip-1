@@ -1,12 +1,9 @@
-import {UpdateType} from '../const.js';
-import Observable from '../framework/observable.js';
-
-export default class OffersModel extends Observable {
+import {ErrorMessage} from '../const.js';
+export default class OffersModel {
   #offersApiService = null;
-  #offers = [];
+  #offers = null;
 
   constructor({offersApiService}) {
-    super();
     this.#offersApiService = offersApiService;
   }
 
@@ -14,10 +11,8 @@ export default class OffersModel extends Observable {
     try {
       this.#offers = await this.#offersApiService.offers;
     } catch(err) {
-      this.#offers = [];
+      throw new Error(ErrorMessage.ERROR_OFFERS_MESSAGE);
     }
-
-    this._notify(UpdateType.INIT);
   }
 
   get offers() {

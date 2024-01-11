@@ -73,6 +73,14 @@ const Method = {
 
 };
 
+const ErrorMessage = {
+  ERROR_CREATE_MESSAGE: 'Failed to create point',
+  ERROR_UPDATE_MESSAGE: 'Failed to update point',
+  ERROR_DELETE_MESSAGE: 'Failed to delete point',
+  ERROR_OFFERS_MESSAGE: 'Failed to load offers',
+  ERROR_DESTINATIONS_MESSAGE: 'Failed to load destinations'
+};
+
 export {
   EMPTY_MESSAGE_TYPE,
   EVENT_TYPES,
@@ -85,5 +93,6 @@ export {
   Path,
   Method,
   API_URL,
-  AUTH_TOKEN
+  AUTH_TOKEN,
+  ErrorMessage
 };

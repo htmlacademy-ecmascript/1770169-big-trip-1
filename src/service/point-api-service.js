@@ -20,8 +20,8 @@ export default class PointApiService extends ApiService {
         headers: new Headers({'Content-Type': 'application/json'})
       }
     );
-
-    return await PointApiService.parseResponse(response);
+    const parsedPoint = await PointApiService.parseResponse(response);
+    return this.#adapter._adaptPointToClient(parsedPoint);
   }
 
   async updatePoint(point) {
@@ -33,8 +33,8 @@ export default class PointApiService extends ApiService {
         headers: new Headers({'Content-Type': 'application/json'})
       }
     );
-
-    return await PointApiService.parseResponse(response);
+    const parsedPoint = await PointApiService.parseResponse(response);
+    return this.#adapter._adaptPointToClient(parsedPoint);
   }
 
   async deletePoint(point) {

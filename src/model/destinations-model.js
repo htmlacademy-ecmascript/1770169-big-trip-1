@@ -1,12 +1,9 @@
-import {UpdateType} from '../const.js';
-import Observable from '../framework/observable.js';
-
-export default class DestinationsModel extends Observable {
+import {ErrorMessage} from '../const.js';
+export default class DestinationsModel {
   #destinationsApiService = null;
-  #destinations = [];
+  #destinations = null;
 
   constructor({destinationsApiService}) {
-    super();
     this.#destinationsApiService = destinationsApiService;
   }
 
@@ -14,10 +11,8 @@ export default class DestinationsModel extends Observable {
     try {
       this.#destinations = await this.#destinationsApiService.destinations;
     } catch(err) {
-      this.#destinations = [];
+      throw new Error(ErrorMessage.ERROR_DESTINATIONS_MESSAGE);
     }
-
-    this._notify(UpdateType.INIT);
   }
 
   get destinations() {
