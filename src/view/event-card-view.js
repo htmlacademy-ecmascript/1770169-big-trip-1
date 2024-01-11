@@ -1,7 +1,7 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import dayjs from 'dayjs';
 import {toCapitalize, getAbbreviatedFormat} from '../utils/utils.js';
-import {DateFormat} from '../const.js';
+import {DateFormat, DEFAULT_POINT} from '../const.js';
 
 const createOfferTemplate = ({title, price}) => (
   `<li class="event__offer">
@@ -61,8 +61,8 @@ export default class EventCardView extends AbstractView {
 
   constructor (
     {
-      point,
-      destination,
+      point = DEFAULT_POINT,
+      destination = DEFAULT_POINT.destination,
       offers,
       onRollupButtonClick,
       onFavoriteButtonClick

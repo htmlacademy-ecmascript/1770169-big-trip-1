@@ -53,7 +53,32 @@ const ActionType = {
 const UpdateType = {
   PATCH: 'patch',
   MINOR: 'minor',
-  MAJOR: 'major'
+  MAJOR: 'major',
+  INIT: 'init'
+};
+
+const API_URL = 'https://20.ecmascript.pages.academy/big-trip';
+const AUTH_TOKEN = 'Basic wGtu7hacTxK0W9au';
+
+const Path = {
+  POINTS: 'points',
+  OFFERS: 'offers',
+  DESTINATIONS: 'destinations'
+};
+
+const Method = {
+  POST: 'post',
+  PUT: 'put',
+  DELETE: 'delete'
+
+};
+
+const ErrorMessage = {
+  ERROR_CREATE_MESSAGE: 'Failed to create point',
+  ERROR_UPDATE_MESSAGE: 'Failed to update point',
+  ERROR_DELETE_MESSAGE: 'Failed to delete point',
+  ERROR_OFFERS_MESSAGE: 'Failed to load offers',
+  ERROR_DESTINATIONS_MESSAGE: 'Failed to load destinations'
 };
 
 export {
@@ -64,5 +89,10 @@ export {
   FilterType,
   SortType,
   ActionType,
-  UpdateType
+  UpdateType,
+  Path,
+  Method,
+  API_URL,
+  AUTH_TOKEN,
+  ErrorMessage
 };

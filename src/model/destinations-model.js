@@ -1,17 +1,29 @@
-import {destinations} from '../mock/destinations.js';
-
+import {ErrorMessage} from '../const.js';
 export default class DestinationsModel {
-  #destinations = destinations;
+  #destinationsApiService = null;
+  #destinations = null;
 
-  get destinations () {
+  constructor({destinationsApiService}) {
+    this.#destinationsApiService = destinationsApiService;
+  }
+
+  async init() {
+    try {
+      this.#destinations = await this.#destinationsApiService.destinations;
+    } catch(err) {
+      throw new Error(ErrorMessage.ERROR_DESTINATIONS_MESSAGE);
+    }
+  }
+
+  get destinations() {
     return this.#destinations;
   }
 
-  _getDestinationsById (id) {
+  _getDestinationsById(id) {
     return this.#destinations.find((destination) => destination.id === id);
   }
 
-  _getDestinationsByName (name) {
+  _getDestinationsByName(name) {
     return this.#destinations.find((destination) => destination.name === name);
   }
 }
