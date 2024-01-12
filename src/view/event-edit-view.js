@@ -58,10 +58,24 @@ const createHeaderTemplate = (availableCities, {type, basePrice, destination}, i
 
     <div class="event__field-group  event__field-group--time">
       <label class="visually-hidden" for="event-start-time-1">From</label>
-      <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" required autocomplete="off">
+      <input
+        class="event__input event__input--time"
+        id="event-start-time-1"
+        type="text"
+        name="event-start-time"
+        required
+        autocomplete="off"
+      >
       &mdash;
       <label class="visually-hidden" for="event-end-time-1">To</label>
-      <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" required autocomplete="off">
+      <input
+        class="event__input event__input--time"
+        id="event-end-time-1"
+        type="text"
+        name="event-end-time"
+        required
+        autocomplete="off"
+      >
     </div>
 
     <div class="event__field-group  event__field-group--price">
@@ -212,9 +226,13 @@ export default class EventEditView extends AbstractStatefulView {
   }
 
   #initDatepicker () {
+    const minDateFrom = dayjs().isAfter(dayjs(this.#point.dateFrom)) ? this.#point.dateFrom : 'today';
+    const minDateTo = dayjs().isAfter(dayjs(this.#point.dateTo)) ? this.#point.dateTo : 'today';
+
     this.#startDatepicker = flatpickr(this.element.querySelector('#event-start-time-1'), {
       allowInput: true,
       dateFormat: DateFormat.DATE_PICKER,
+      minDate: minDateFrom,
       defaultDate: this.#point.dateFrom,
       enableTime: true,
       onChange: this.#startDateChangeHandler
@@ -223,6 +241,7 @@ export default class EventEditView extends AbstractStatefulView {
     this.#endDatepicker = flatpickr(this.element.querySelector('#event-end-time-1'), {
       allowInput: true,
       dateFormat: DateFormat.DATE_PICKER,
+      minDate: minDateTo,
       defaultDate: this.#point.dateTo,
       enableTime: true,
       onChange: this.#endDateChangeHandler
