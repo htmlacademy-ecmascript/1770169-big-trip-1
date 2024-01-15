@@ -25,6 +25,13 @@ const pointsModel = new PointsModel(
   }
 );
 const filterModel = new FilterModel();
+const filterPresenter = new FilterPresenter(
+  {
+    filterContainer: filtersElement,
+    filterModel,
+    pointsModel
+  }
+);
 const eventPresenter = new EventPresenter(
   {
     tripMainContainer: tripMainElement,
@@ -35,12 +42,6 @@ const eventPresenter = new EventPresenter(
     offersModel,
     filterModel,
     onCloseClick: newEventCardCloseHandler
-  }
-);
-const filterPresenter = new FilterPresenter(
-  {
-    filterContainer: filtersElement,
-    filterModel
   }
 );
 const newEventButtonComponent = new NewEventButtonView({onButtonClick: newEventButtonClickHandler});
@@ -54,9 +55,8 @@ function newEventCardCloseHandler () {
   newEventButtonComponent.element.disabled = false;
 }
 
-
+filterPresenter.init();
 pointsModel.init();
 eventPresenter.init();
-filterPresenter.init();
 
 render(newEventButtonComponent, tripMainElement);

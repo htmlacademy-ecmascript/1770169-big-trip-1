@@ -20,16 +20,25 @@ const createSortListTemplate = (currentSortType) => (
 
 export default class SortListView extends AbstractView {
   #currentSortType;
-  #handlerFormClick = null;
+  #handleFormClick = null;
 
-  constructor ({currentSortType, onFormClick}) {
+  constructor({currentSortType, onFormClick}) {
     super();
     this.#currentSortType = currentSortType;
-    this.#handlerFormClick = onFormClick;
-    this.element.addEventListener('click', this.#handlerFormClick);
+    this.#handleFormClick = onFormClick;
+    this.element.addEventListener('click', this.#formClickHandler);
   }
 
-  get template () {
+  get template() {
     return createSortListTemplate(this.#currentSortType);
+  }
+
+  #formClickHandler(evt) {
+    evt.preventDefault();
+
+    if (!evt.target.matches('.trip-sort__btn')) {
+      return;
+    }
+    this.#handleFormClick();
   }
 }

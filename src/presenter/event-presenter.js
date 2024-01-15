@@ -19,6 +19,7 @@ export default class EventPresenter {
   #tripMainContainer = null;
   #eventsContainer = null;
   #newEventCardPresenter = null;
+  #eventCardPresenter = null;
   #pointsModel = null;
   #destinationsModel = null;
   #offersModel = null;
@@ -93,7 +94,8 @@ export default class EventPresenter {
     this.#infoComponent = new InfoView(
       {
         points: this.points,
-        destinations: this.destinations
+        destinations: this.destinations,
+        offers: this.#offersModel.offers
       }
     );
     render(this.#infoComponent, this.#tripMainContainer, RenderPosition.AFTERBEGIN);
@@ -103,7 +105,7 @@ export default class EventPresenter {
     this.#sortComponent = new SortListView(
       {
         currentSortType: this.#currentSortType,
-        onFormClick: this.#sortFormClickHandler
+        onFormClick: this.#handleFormClick
       }
     );
     render(this.#sortComponent, this.#eventsContainer);
@@ -127,7 +129,7 @@ export default class EventPresenter {
   }
 
   #renderEventCard(point) {
-    const eventCardPresenter = new EventCardPresenter(
+    this.#eventCardPresenter = new EventCardPresenter(
       {
         destinationsModel: this.#destinationsModel,
         offersModel: this.#offersModel,
@@ -135,12 +137,12 @@ export default class EventPresenter {
         getDestination: this.#getDestination,
         getOffers: this.#getOffers,
         onEventCardChange: this.#handleViewAction,
-        onEventCardReset: this.#eventCardResetHandler
+        onEventCardReset: this.#handleEventCardReset
       }
     );
-    eventCardPresenter.init(point);
+    this.#eventCardPresenter.init(point);
 
-    this.#eventCardPresenters.set(point.id, eventCardPresenter);
+    this.#eventCardPresenters.set(point.id, this.#eventCardPresenter);
   }
 
   #renderEventElements() {
@@ -253,10 +255,7 @@ export default class EventPresenter {
     }
   };
 
-  #sortFormClickHandler = (evt) => {
-    if (!evt.target.matches('.trip-sort__btn')) {
-      return;
-    }
+  #handleFormClick = (evt) => {
     const sortType = evt.target.dataset.type;
 
     if (sortType === this.#currentSortType || sortType === SortType.EVENT || sortType === SortType.OFFER) {
@@ -267,7 +266,7 @@ export default class EventPresenter {
     this.#renderEventElements();
   };
 
-  #eventCardResetHandler = () => {
+  #handleEventCardReset = () => {
     this.#eventCardPresenters.forEach((presenter) => presenter._resetEventCard());
     this.#newEventCardPresenter.close();
   };

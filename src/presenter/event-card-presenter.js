@@ -3,7 +3,6 @@ import EventCardView from '../view/event-card-view';
 import EventEditView from '../view/event-edit-view';
 import {getDestinationNames, isEscape} from '../utils/utils';
 import {ActionType, UpdateType} from '../const';
-import dayjs from 'dayjs';
 
 export default class EventCardPresenter {
   #point = null;
@@ -16,7 +15,7 @@ export default class EventCardPresenter {
   #getDestination = null;
   #getOffers = null;
   #eventCardChangeHandler = null;
-  #eventCardResetHandler = null;
+  #handleEventCardReset = null;
   #isEventOpen = false;
 
   constructor(
@@ -36,7 +35,7 @@ export default class EventCardPresenter {
     this.#getDestination = getDestination;
     this.#getOffers = getOffers;
     this.#eventCardChangeHandler = onEventCardChange;
-    this.#eventCardResetHandler = onEventCardReset;
+    this.#handleEventCardReset = onEventCardReset;
   }
 
   init(point) {
@@ -97,7 +96,7 @@ export default class EventCardPresenter {
 
   #replaceEventCard () {
     replace(this.#eventEditComponent, this.#eventCardComponent);
-    this.#eventCardResetHandler();
+    this.#handleEventCardReset();
   }
 
   #replaceEventEdit () {
@@ -170,14 +169,9 @@ export default class EventCardPresenter {
   };
 
   #formSubmitHandler = (point) => {
-    this.#hideEventEdit();
-    const currentDuration = dayjs(point.dateTo).diff(point.dateFrom);
-    const prevDuration = dayjs(this.#point.dateTo).diff(this.#point.dateFrom);
-    const isMinorUpdate = point.basePrice !== this.#point.basePrice || currentDuration !== prevDuration;
-
     this.#eventCardChangeHandler(
       ActionType.UPDATE_POINT,
-      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      UpdateType.MINOR,
       point
     );
   };

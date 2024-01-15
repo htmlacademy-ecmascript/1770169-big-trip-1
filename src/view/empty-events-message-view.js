@@ -5,12 +5,13 @@ const createEmptyEventsMessageTemplate = (currentFilterType) => `<p class="trip-
 
 export default class EmptyEventsMessageView extends AbstractView {
   #currentFilterType = null;
-  constructor ({currentFilterType}) {
+
+  constructor({currentFilterType}) {
     super();
     this.#currentFilterType = currentFilterType;
   }
 
-  get template () {
+  get template() {
     return createEmptyEventsMessageTemplate(this.#currentFilterType);
   }
 }
