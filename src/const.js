@@ -81,6 +81,11 @@ const ErrorMessage = {
   ERROR_DESTINATIONS_MESSAGE: 'Failed to load destinations'
 };
 
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
+
 export {
   EMPTY_MESSAGE_TYPE,
   EVENT_TYPES,
@@ -94,5 +99,6 @@ export {
   Method,
   API_URL,
   AUTH_TOKEN,
-  ErrorMessage
+  ErrorMessage,
+  TimeLimit
 };

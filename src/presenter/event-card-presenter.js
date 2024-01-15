@@ -128,6 +128,41 @@ export default class EventCardPresenter {
     this.#eventStatus = false;
   }
 
+  setSaving() {
+    if (this.#eventStatus) {
+      this.#eventEditComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#eventStatus) {
+      this.#eventEditComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  }
+
+  setAborting() {
+    if (!this.#eventStatus) {
+      this.#eventCardComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#eventEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#eventEditComponent.shake(resetFormState);
+  }
+
   #documentKeydownHandler = (evt) => {
     if (isEscape(evt)) {
       this.#hideEventEdit();
