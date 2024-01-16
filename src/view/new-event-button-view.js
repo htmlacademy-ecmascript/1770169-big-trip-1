@@ -8,7 +8,6 @@ export default class NewEventButtonView extends AbstractView {
   constructor({onButtonClick}) {
     super();
     this.#handleButtonClick = onButtonClick;
-
     this.element.addEventListener('click', this.#buttonClickHandler);
   }
 

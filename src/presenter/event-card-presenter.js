@@ -1,7 +1,7 @@
 import {render, replace, remove} from '../framework/render';
 import EventCardView from '../view/event-card-view';
 import EventEditView from '../view/event-edit-view';
-import {getDestinationNames, isEscape} from '../utils/utils';
+import {getDestinationNames, isEscape} from '../utils/point';
 import {ActionType, UpdateType} from '../const';
 
 export default class EventCardPresenter {
@@ -14,7 +14,7 @@ export default class EventCardPresenter {
   #eventEditComponent = null;
   #getDestination = null;
   #getOffers = null;
-  #eventCardChangeHandler = null;
+  #handleEventCardChange = null;
   #handleEventCardReset = null;
   #isEventOpen = false;
 
@@ -34,7 +34,7 @@ export default class EventCardPresenter {
     this.#eventListContainer = eventListContainer;
     this.#getDestination = getDestination;
     this.#getOffers = getOffers;
-    this.#eventCardChangeHandler = onEventCardChange;
+    this.#handleEventCardChange = onEventCardChange;
     this.#handleEventCardReset = onEventCardReset;
   }
 
@@ -169,7 +169,7 @@ export default class EventCardPresenter {
   };
 
   #formSubmitHandler = (point) => {
-    this.#eventCardChangeHandler(
+    this.#handleEventCardChange(
       ActionType.UPDATE_POINT,
       UpdateType.MINOR,
       point
@@ -177,7 +177,7 @@ export default class EventCardPresenter {
   };
 
   #formResetHandler = () => {
-    this.#eventCardChangeHandler(
+    this.#handleEventCardChange(
       ActionType.DELETE_POINT,
       UpdateType.MINOR,
       this.#point
@@ -192,7 +192,7 @@ export default class EventCardPresenter {
   };
 
   #favoriteButtonClickHandler = () => {
-    this.#eventCardChangeHandler(
+    this.#handleEventCardChange(
       ActionType.UPDATE_POINT,
       UpdateType.PATCH,
       {...this.#point, isFavorite: !this.#point.isFavorite}

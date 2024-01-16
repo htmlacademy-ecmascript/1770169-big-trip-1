@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
-import {DateFormat} from '../const.js';
 import duration from 'dayjs/plugin/duration';
+import {DateFormat} from '../const';
 
 dayjs.extend(duration);
 

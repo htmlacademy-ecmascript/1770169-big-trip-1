@@ -26,18 +26,26 @@ const createFilterListTemplate = (filter, currentFilterType) => (
 );
 export default class FilterListView extends AbstractView {
   #filter = null;
-  #currentFilterType;
-  #filterChangeHandler = null;
+  #currentFilterType = null;
+  #handleFilterChange = null;
 
   constructor({filter, currentFilterType, onFilterChange}) {
     super();
     this.#filter = filter;
     this.#currentFilterType = currentFilterType;
-    this.#filterChangeHandler = onFilterChange;
+    this.#handleFilterChange = onFilterChange;
     this.element.addEventListener('change', this.#filterChangeHandler);
   }
 
   get template() {
     return createFilterListTemplate(this.#filter, this.#currentFilterType);
   }
+
+  #filterChangeHandler = (evt) => {
+    evt.preventDefault();
+
+    if (evt.target.matches('.trip-filters__filter-input')) {
+      this.#handleFilterChange(evt);
+    }
+  };
 }

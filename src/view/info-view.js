@@ -1,7 +1,7 @@
 import AbstractView from '../framework/view/abstract-view';
 import dayjs from 'dayjs';
 import minMax from 'dayjs/plugin/minMax';
-import {getDestinationNames, getPriceSum} from '../utils/utils';
+import {getDestinationNames, getPriceSum} from '../utils/point';
 
 dayjs.extend(minMax);
 

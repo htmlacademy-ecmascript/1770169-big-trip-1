@@ -1,7 +1,7 @@
-import {render, replace, remove} from '../framework/render.js';
-import FilterListView from '../view/filter-list-view.js';
-import {UpdateType, FilterType} from '../const.js';
-import {filter} from '../utils/filter.js';
+import {render, replace, remove} from '../framework/render';
+import FilterListView from '../view/filter-list-view';
+import {UpdateType, FilterType} from '../const';
+import {filter} from '../utils/filter';
 
 export default class FilterPresenter {
   #filterContainer = null;
@@ -51,15 +51,13 @@ export default class FilterPresenter {
   };
 
   #filterChangeHandler = (evt) => {
-    if (evt.target.matches('.trip-filters__filter-input')) {
-      if (this.#filterModel.filter === evt.target.value) {
-        return;
-      }
-
-      this.#filterModel.filter = {
-        updateType: UpdateType.MAJOR,
-        filterType: evt.target.value
-      };
+    if (this.#filterModel.filter === evt.target.value) {
+      return;
     }
+
+    this.#filterModel.filter = {
+      updateType: UpdateType.MAJOR,
+      filterType: evt.target.value
+    };
   };
 }

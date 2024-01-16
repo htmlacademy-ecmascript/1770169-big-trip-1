@@ -1,7 +1,7 @@
-import EventEditView from '../view/event-edit-view.js';
-import {RenderPosition, render, remove} from '../framework/render.js';
-import {getDestinationNames, isEscape} from '../utils/utils';
-import {ActionType, DEFAULT_POINT, UpdateType} from '../const.js';
+import EventEditView from '../view/event-edit-view';
+import {RenderPosition, render, remove} from '../framework/render';
+import {getDestinationNames, isEscape} from '../utils/point';
+import {ActionType, DEFAULT_POINT, UpdateType} from '../const';
 
 export default class NewEventCardPresenter {
   #destinationsModel = null;
@@ -11,7 +11,7 @@ export default class NewEventCardPresenter {
   #eventListContainer = null;
   #getDestination = null;
   #getOffers = null;
-  #eventCardChangeHandler = null;
+  #handleEventCardChange = null;
   #handleClose = null;
 
   constructor(
@@ -30,7 +30,7 @@ export default class NewEventCardPresenter {
     this.#eventListContainer = eventListContainer;
     this.#getDestination = getDestination;
     this.#getOffers = getOffers;
-    this.#eventCardChangeHandler = onEventCardChange;
+    this.#handleEventCardChange = onEventCardChange;
     this.#handleClose = onCloseClick;
   }
 
@@ -85,7 +85,7 @@ export default class NewEventCardPresenter {
   }
 
   #formSubmitHandler = (point) => {
-    this.#eventCardChangeHandler(
+    this.#handleEventCardChange(
       ActionType.ADD_POINT,
       UpdateType.MINOR,
       point

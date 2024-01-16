@@ -1,5 +1,5 @@
-import ApiService from '../framework/api-service.js';
-import {Path} from '../const.js';
+import ApiService from '../framework/api-service';
+import {Path} from '../const';
 
 export default class OffersApiService extends ApiService {
   get offers() {
@@ -7,4 +7,3 @@ export default class OffersApiService extends ApiService {
       .then(OffersApiService.parseResponse);
   }
 }
-

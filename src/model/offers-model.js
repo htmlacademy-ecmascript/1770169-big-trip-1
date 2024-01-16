@@ -1,4 +1,4 @@
-import {ErrorMessage} from '../const.js';
+import {ErrorMessage} from '../const';
 export default class OffersModel {
   #offersApiService = null;
   #offers = null;
