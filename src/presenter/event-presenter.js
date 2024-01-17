@@ -90,6 +90,14 @@ export default class EventPresenter {
     this.#renderEventElements();
   }
 
+  createNewPoint() {
+    this.#filterModel.filter = {
+      updateType: UpdateType.MAJOR,
+      filterType: FilterType.EVERYTHING
+    };
+    this.#newEventCardPresenter.init();
+  }
+
   #renderInfoElement() {
     this.#infoComponent = new InfoView(
       {
@@ -166,14 +174,6 @@ export default class EventPresenter {
     }
 
     this.#renderEventCards();
-  }
-
-  createNewPoint() {
-    this.#filterModel.filter = {
-      updateType: UpdateType.MAJOR,
-      filterType: FilterType.EVERYTHING
-    };
-    this.#newEventCardPresenter.init();
   }
 
   #clearEventElements({resetSortType = false} = {}) {

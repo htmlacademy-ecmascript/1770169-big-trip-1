@@ -38,6 +38,14 @@ export default class EventCardPresenter {
     this.#handleEventCardReset = onEventCardReset;
   }
 
+  get #eventStatus() {
+    return this.#isEventOpen;
+  }
+
+  set #eventStatus(value) {
+    this.#isEventOpen = value;
+  }
+
   init(point) {
     this.#point = point;
     this.#destinations = this.#destinationsModel.destinations;
@@ -86,41 +94,33 @@ export default class EventCardPresenter {
     remove(prevEventEditComponent);
   }
 
-  get #eventStatus() {
-    return this.#isEventOpen;
-  }
-
-  set #eventStatus(value) {
-    this.#isEventOpen = value;
-  }
-
-  #replaceEventCard () {
-    replace(this.#eventEditComponent, this.#eventCardComponent);
-    this.#handleEventCardReset();
-  }
-
-  #replaceEventEdit () {
-    replace(this.#eventCardComponent, this.#eventEditComponent);
-  }
-
-  _removeComponent () {
+  _removeComponent() {
     remove(this.#eventCardComponent);
     remove(this.#eventEditComponent);
   }
 
-  _resetEventCard () {
+  _resetEventCard() {
     if (this.#eventStatus) {
       this.#hideEventEdit();
     }
   }
 
-  #showEventEdit () {
+  #replaceEventCard() {
+    replace(this.#eventEditComponent, this.#eventCardComponent);
+    this.#handleEventCardReset();
+  }
+
+  #replaceEventEdit() {
+    replace(this.#eventCardComponent, this.#eventEditComponent);
+  }
+
+  #showEventEdit() {
     this.#replaceEventCard();
     document.addEventListener('keydown', this.#documentKeydownHandler);
     this.#eventStatus = true;
   }
 
-  #hideEventEdit () {
+  #hideEventEdit() {
     this.#eventEditComponent.reset();
     this.#replaceEventEdit();
     document.removeEventListener('keydown', this.#documentKeydownHandler);

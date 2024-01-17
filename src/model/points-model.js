@@ -13,6 +13,10 @@ export default class PointsModel extends Observable {
     this.#offersModel = offersModel;
   }
 
+  get points() {
+    return this.#points;
+  }
+
   async init() {
     try {
       await this.#destinationsModel.init();
@@ -23,10 +27,6 @@ export default class PointsModel extends Observable {
     }
 
     this._notify(UpdateType.INIT);
-  }
-
-  get points() {
-    return this.#points;
   }
 
   _getPointById(id) {

@@ -254,6 +254,10 @@ export default class EventEditView extends AbstractStatefulView {
     this.#initDatepicker();
   }
 
+  reset() {
+    this.updateElement(EventEditView.parsePointsToState(this.#point, this.#destination, this.#offers, this.#checkedOffers));
+  }
+
   #initDatepicker() {
     const minDateFrom = dayjs().isAfter(dayjs(this.#point.dateFrom)) ? this.#point.dateFrom : 'today';
     const minDateTo = dayjs().isAfter(dayjs(this.#point.dateTo)) ? this.#point.dateTo : 'today';
@@ -275,37 +279,6 @@ export default class EventEditView extends AbstractStatefulView {
       enableTime: true,
       onChange: this.#endDateChangeHandler
     });
-  }
-
-  static parsePointsToState(points, destination, offer, checkedOffers) {
-    return {
-      ...points,
-      destination,
-      offers: {
-        ...offer,
-        offers: offer.offers.map((item) => ({...item, isChecked: checkedOffers.includes(item.id) ? 'checked' : ''}))
-      },
-      isDisabled: false,
-      isSaving: false,
-      isDeleting: false,
-    };
-  }
-
-  static parseStateToPoints(state) {
-    const points = {...state};
-    points.basePrice = points.basePrice ? parseInt(points.basePrice, 10) : 0;
-    points.destination = points.destination.id;
-    points.offers = points.offers.offers.filter((offer) => offer.isChecked === 'checked').map((offer) => offer.id);
-
-    delete points.isDisabled;
-    delete points.isSaving;
-    delete points.isDeleting;
-
-    return points;
-  }
-
-  reset() {
-    this.updateElement(EventEditView.parsePointsToState(this.#point, this.#destination, this.#offers, this.#checkedOffers));
   }
 
   #formSubmitHandler = (evt) => {
@@ -376,4 +349,31 @@ export default class EventEditView extends AbstractStatefulView {
       );
     }
   };
+
+  static parsePointsToState(points, destination, offer, checkedOffers) {
+    return {
+      ...points,
+      destination,
+      offers: {
+        ...offer,
+        offers: offer.offers.map((item) => ({...item, isChecked: checkedOffers.includes(item.id) ? 'checked' : ''}))
+      },
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
+    };
+  }
+
+  static parseStateToPoints(state) {
+    const points = {...state};
+    points.basePrice = points.basePrice ? parseInt(points.basePrice, 10) : 0;
+    points.destination = points.destination.id;
+    points.offers = points.offers.offers.filter((offer) => offer.isChecked === 'checked').map((offer) => offer.id);
+
+    delete points.isDisabled;
+    delete points.isSaving;
+    delete points.isDeleting;
+
+    return points;
+  }
 }
