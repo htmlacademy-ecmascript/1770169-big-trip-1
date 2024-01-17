@@ -7,7 +7,7 @@ import EventCardPresenter from './event-card-presenter';
 import NewEventCardPresenter from './new-event-card-presenter';
 import UiBlocker from '../framework/ui-blocker/ui-blocker';
 import {RenderPosition, render, remove} from '../framework/render';
-import {sortByPrice, sortByTime} from '../utils/point';
+import {sortByPrice, sortByTime} from '../utils/sort';
 import {filter} from '../utils/filter';
 import {ActionType, SortType, UpdateType, FilterType, TimeLimit} from '../const';
 export default class EventPresenter {

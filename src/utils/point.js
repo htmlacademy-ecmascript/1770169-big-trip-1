@@ -40,14 +40,6 @@ const getLastTwoWords = (text) => {
   return textArray.slice(textArray.length - 2).join('-');
 };
 
-const sortByPrice = (a, b) => b.basePrice - a.basePrice;
-
-const sortByTime = (a, b) => {
-  const firstPointDuration = dayjs(a.dateTo).diff(a.dateFrom);
-  const secondPointDuration = dayjs(b.dateTo).diff(b.dateFrom);
-  return secondPointDuration - firstPointDuration;
-};
-
 const isEscape = (evt) => evt.key === 'Escape';
 
 export {
@@ -56,7 +48,5 @@ export {
   getPriceSum,
   getAbbreviatedFormat,
   getLastTwoWords,
-  sortByPrice,
-  sortByTime,
   isEscape
 };
