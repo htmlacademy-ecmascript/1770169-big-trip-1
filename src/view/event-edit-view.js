@@ -268,6 +268,7 @@ export default class EventEditView extends AbstractStatefulView {
       minDate: minDateFrom,
       defaultDate: this.#point.dateFrom,
       enableTime: true,
+      'time_24hr': true,
       onChange: this.#startDateChangeHandler
     });
 
@@ -277,6 +278,7 @@ export default class EventEditView extends AbstractStatefulView {
       minDate: minDateTo,
       defaultDate: this.#point.dateTo,
       enableTime: true,
+      'time_24hr': true,
       onChange: this.#endDateChangeHandler
     });
   }
