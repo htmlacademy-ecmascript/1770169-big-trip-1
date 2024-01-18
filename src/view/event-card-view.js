@@ -1,7 +1,7 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractView from '../framework/view/abstract-view';
 import dayjs from 'dayjs';
-import {toCapitalize, getAbbreviatedFormat} from '../utils/utils.js';
-import {DateFormat, DEFAULT_POINT} from '../const.js';
+import {toCapitalize, getAbbreviatedFormat} from '../utils/point';
+import {DateFormat, DEFAULT_POINT} from '../const';
 
 const createOfferTemplate = ({title, price}) => (
   `<li class="event__offer">
@@ -56,10 +56,10 @@ export default class EventCardView extends AbstractView {
   #point = null;
   #destination = null;
   #offers = null;
-  #rollupButtonClickHandler = null;
-  #favoriteButtonClickHandler = null;
+  #handleRollupButtonClick = null;
+  #handleFavoriteButtonClick = null;
 
-  constructor (
+  constructor(
     {
       point = DEFAULT_POINT,
       destination = DEFAULT_POINT.destination,
@@ -68,21 +68,30 @@ export default class EventCardView extends AbstractView {
       onFavoriteButtonClick
     }
   ) {
-    super ();
+    super();
     this.#point = point;
     this.#destination = destination;
     this.#offers = offers;
-    this.#rollupButtonClickHandler = onRollupButtonClick;
-    this.#favoriteButtonClickHandler = onFavoriteButtonClick;
+    this.#handleRollupButtonClick = onRollupButtonClick;
+    this.#handleFavoriteButtonClick = onFavoriteButtonClick;
 
     this.element.querySelector('.event__rollup-btn')
-      .addEventListener('click', (evt) => this.#rollupButtonClickHandler(evt));
+      .addEventListener('click', this.#rollupButtonClickHandler);
     this.element.querySelector('.event__favorite-btn')
       .addEventListener('click', this.#favoriteButtonClickHandler);
   }
 
-  get template () {
+  get template() {
     return createEventCardTemplate(this.#point, this.#destination, this.#offers);
   }
 
+  #rollupButtonClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleRollupButtonClick();
+  };
+
+  #favoriteButtonClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFavoriteButtonClick();
+  };
 }

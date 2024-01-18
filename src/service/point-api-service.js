@@ -1,6 +1,6 @@
-import ApiService from '../framework/api-service.js';
-import Adapter from '../adapter.js';
-import {Path, Method} from '../const.js';
+import ApiService from '../framework/api-service';
+import Adapter from '../adapter';
+import {Path, Method} from '../const';
 
 export default class PointApiService extends ApiService {
   #adapter = new Adapter();

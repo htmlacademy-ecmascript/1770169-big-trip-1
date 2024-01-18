@@ -1,5 +1,5 @@
-import {UpdateType, ErrorMessage} from '../const.js';
-import Observable from '../framework/observable.js';
+import {UpdateType, ErrorMessage} from '../const';
+import Observable from '../framework/observable';
 export default class PointsModel extends Observable {
   #pointApiService = null;
   #destinationsModel = null;
@@ -13,6 +13,10 @@ export default class PointsModel extends Observable {
     this.#offersModel = offersModel;
   }
 
+  get points() {
+    return this.#points;
+  }
+
   async init() {
     try {
       await this.#destinationsModel.init();
@@ -23,10 +27,6 @@ export default class PointsModel extends Observable {
     }
 
     this._notify(UpdateType.INIT);
-  }
-
-  get points() {
-    return this.#points;
   }
 
   _getPointById(id) {

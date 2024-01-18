@@ -1,15 +1,15 @@
-import EventListView from '../view/event-list-view.js';
-import EmptyEventsMessageView from '../view/empty-events-message-view.js';
-import InfoView from '../view/info-view.js';
-import LoadingView from '../view/loading-view.js';
-import SortListView from '../view/sort-list-view.js';
-import EventCardPresenter from './event-card-presenter.js';
-import NewEventCardPresenter from './new-event-card-presenter.js';
-import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
-import {RenderPosition, render, remove} from '../framework/render.js';
-import {sortByPrice, sortByTime} from '../utils/utils.js';
-import {filter} from '../utils/filter.js';
-import {ActionType, SortType, UpdateType, FilterType, TimeLimit} from '../const.js';
+import EventListView from '../view/event-list-view';
+import EmptyEventsMessageView from '../view/empty-events-message-view';
+import InfoView from '../view/info-view';
+import LoadingView from '../view/loading-view';
+import SortListView from '../view/sort-list-view';
+import EventCardPresenter from './event-card-presenter';
+import NewEventCardPresenter from './new-event-card-presenter';
+import UiBlocker from '../framework/ui-blocker/ui-blocker';
+import {RenderPosition, render, remove} from '../framework/render';
+import {sortByPrice, sortByTime} from '../utils/sort';
+import {filter} from '../utils/filter';
+import {ActionType, SortType, UpdateType, FilterType, TimeLimit} from '../const';
 export default class EventPresenter {
   #eventListComponent = new EventListView();
   #loadingComponent = new LoadingView();
@@ -19,6 +19,7 @@ export default class EventPresenter {
   #tripMainContainer = null;
   #eventsContainer = null;
   #newEventCardPresenter = null;
+  #eventCardPresenter = null;
   #pointsModel = null;
   #destinationsModel = null;
   #offersModel = null;
@@ -32,7 +33,7 @@ export default class EventPresenter {
     upperLimit: TimeLimit.UPPER_LIMIT
   });
 
-  constructor (
+  constructor(
     {
       tripMainContainer,
       eventsContainer,
@@ -89,11 +90,20 @@ export default class EventPresenter {
     this.#renderEventElements();
   }
 
+  createNewPoint() {
+    this.#filterModel.filter = {
+      updateType: UpdateType.MAJOR,
+      filterType: FilterType.EVERYTHING
+    };
+    this.#newEventCardPresenter.init();
+  }
+
   #renderInfoElement() {
     this.#infoComponent = new InfoView(
       {
         points: this.points,
-        destinations: this.destinations
+        destinations: this.destinations,
+        offers: this.#offersModel.offers
       }
     );
     render(this.#infoComponent, this.#tripMainContainer, RenderPosition.AFTERBEGIN);
@@ -103,7 +113,7 @@ export default class EventPresenter {
     this.#sortComponent = new SortListView(
       {
         currentSortType: this.#currentSortType,
-        onFormClick: this.#sortFormClickHandler
+        onFormClick: this.#formClickHandler
       }
     );
     render(this.#sortComponent, this.#eventsContainer);
@@ -127,7 +137,7 @@ export default class EventPresenter {
   }
 
   #renderEventCard(point) {
-    const eventCardPresenter = new EventCardPresenter(
+    this.#eventCardPresenter = new EventCardPresenter(
       {
         destinationsModel: this.#destinationsModel,
         offersModel: this.#offersModel,
@@ -138,9 +148,9 @@ export default class EventPresenter {
         onEventCardReset: this.#eventCardResetHandler
       }
     );
-    eventCardPresenter.init(point);
+    this.#eventCardPresenter.init(point);
 
-    this.#eventCardPresenters.set(point.id, eventCardPresenter);
+    this.#eventCardPresenters.set(point.id, this.#eventCardPresenter);
   }
 
   #renderEventElements() {
@@ -164,14 +174,6 @@ export default class EventPresenter {
     }
 
     this.#renderEventCards();
-  }
-
-  createNewPoint() {
-    this.#filterModel.filter = {
-      updateType: UpdateType.MAJOR,
-      filterType: FilterType.EVERYTHING
-    };
-    this.#newEventCardPresenter.init();
   }
 
   #clearEventElements({resetSortType = false} = {}) {
@@ -253,10 +255,7 @@ export default class EventPresenter {
     }
   };
 
-  #sortFormClickHandler = (evt) => {
-    if (!evt.target.matches('.trip-sort__btn')) {
-      return;
-    }
+  #formClickHandler = (evt) => {
     const sortType = evt.target.dataset.type;
 
     if (sortType === this.#currentSortType || sortType === SortType.EVENT || sortType === SortType.OFFER) {

@@ -1,9 +1,8 @@
 import {render, replace, remove} from '../framework/render';
 import EventCardView from '../view/event-card-view';
 import EventEditView from '../view/event-edit-view';
-import {getDestinationNames, isEscape} from '../utils/utils';
+import {getDestinationNames, isEscape} from '../utils/point';
 import {ActionType, UpdateType} from '../const';
-import dayjs from 'dayjs';
 
 export default class EventCardPresenter {
   #point = null;
@@ -15,8 +14,8 @@ export default class EventCardPresenter {
   #eventEditComponent = null;
   #getDestination = null;
   #getOffers = null;
-  #eventCardChangeHandler = null;
-  #eventCardResetHandler = null;
+  #handleEventCardChange = null;
+  #handleEventCardReset = null;
   #isEventOpen = false;
 
   constructor(
@@ -35,8 +34,16 @@ export default class EventCardPresenter {
     this.#eventListContainer = eventListContainer;
     this.#getDestination = getDestination;
     this.#getOffers = getOffers;
-    this.#eventCardChangeHandler = onEventCardChange;
-    this.#eventCardResetHandler = onEventCardReset;
+    this.#handleEventCardChange = onEventCardChange;
+    this.#handleEventCardReset = onEventCardReset;
+  }
+
+  get #eventStatus() {
+    return this.#isEventOpen;
+  }
+
+  set #eventStatus(value) {
+    this.#isEventOpen = value;
   }
 
   init(point) {
@@ -87,41 +94,33 @@ export default class EventCardPresenter {
     remove(prevEventEditComponent);
   }
 
-  get #eventStatus() {
-    return this.#isEventOpen;
-  }
-
-  set #eventStatus(value) {
-    this.#isEventOpen = value;
-  }
-
-  #replaceEventCard () {
-    replace(this.#eventEditComponent, this.#eventCardComponent);
-    this.#eventCardResetHandler();
-  }
-
-  #replaceEventEdit () {
-    replace(this.#eventCardComponent, this.#eventEditComponent);
-  }
-
-  _removeComponent () {
+  _removeComponent() {
     remove(this.#eventCardComponent);
     remove(this.#eventEditComponent);
   }
 
-  _resetEventCard () {
+  _resetEventCard() {
     if (this.#eventStatus) {
       this.#hideEventEdit();
     }
   }
 
-  #showEventEdit () {
+  #replaceEventCard() {
+    replace(this.#eventEditComponent, this.#eventCardComponent);
+    this.#handleEventCardReset();
+  }
+
+  #replaceEventEdit() {
+    replace(this.#eventCardComponent, this.#eventEditComponent);
+  }
+
+  #showEventEdit() {
     this.#replaceEventCard();
     document.addEventListener('keydown', this.#documentKeydownHandler);
     this.#eventStatus = true;
   }
 
-  #hideEventEdit () {
+  #hideEventEdit() {
     this.#eventEditComponent.reset();
     this.#replaceEventEdit();
     document.removeEventListener('keydown', this.#documentKeydownHandler);
@@ -170,20 +169,15 @@ export default class EventCardPresenter {
   };
 
   #formSubmitHandler = (point) => {
-    this.#hideEventEdit();
-    const currentDuration = dayjs(point.dateTo).diff(point.dateFrom);
-    const prevDuration = dayjs(this.#point.dateTo).diff(this.#point.dateFrom);
-    const isMinorUpdate = point.basePrice !== this.#point.basePrice || currentDuration !== prevDuration;
-
-    this.#eventCardChangeHandler(
+    this.#handleEventCardChange(
       ActionType.UPDATE_POINT,
-      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      UpdateType.MINOR,
       point
     );
   };
 
   #formResetHandler = () => {
-    this.#eventCardChangeHandler(
+    this.#handleEventCardChange(
       ActionType.DELETE_POINT,
       UpdateType.MINOR,
       this.#point
@@ -198,7 +192,7 @@ export default class EventCardPresenter {
   };
 
   #favoriteButtonClickHandler = () => {
-    this.#eventCardChangeHandler(
+    this.#handleEventCardChange(
       ActionType.UPDATE_POINT,
       UpdateType.PATCH,
       {...this.#point, isFavorite: !this.#point.isFavorite}

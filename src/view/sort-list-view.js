@@ -1,5 +1,5 @@
-import AbstractView from '../framework/view/abstract-view.js';
-import {SortType} from '../const.js';
+import AbstractView from '../framework/view/abstract-view';
+import {SortType} from '../const';
 
 const createSortTemplate = (sortType, currentSortType) => {
   const checked = sortType === currentSortType ? 'checked' : '';
@@ -20,16 +20,25 @@ const createSortListTemplate = (currentSortType) => (
 
 export default class SortListView extends AbstractView {
   #currentSortType;
-  #handlerFormClick = null;
+  #handleFormClick = null;
 
-  constructor ({currentSortType, onFormClick}) {
+  constructor({currentSortType, onFormClick}) {
     super();
     this.#currentSortType = currentSortType;
-    this.#handlerFormClick = onFormClick;
-    this.element.addEventListener('click', this.#handlerFormClick);
+    this.#handleFormClick = onFormClick;
+    this.element.addEventListener('click', this.#formClickHandler);
   }
 
-  get template () {
+  get template() {
     return createSortListTemplate(this.#currentSortType);
   }
+
+  #formClickHandler = (evt) => {
+    evt.preventDefault();
+
+    if (!evt.target.matches('.trip-sort__btn')) {
+      return;
+    }
+    this.#handleFormClick(evt);
+  };
 }

@@ -7,16 +7,16 @@ export default class DestinationsModel {
     this.#destinationsApiService = destinationsApiService;
   }
 
+  get destinations() {
+    return this.#destinations;
+  }
+
   async init() {
     try {
       this.#destinations = await this.#destinationsApiService.destinations;
     } catch(err) {
       throw new Error(ErrorMessage.ERROR_DESTINATIONS_MESSAGE);
     }
-  }
-
-  get destinations() {
-    return this.#destinations;
   }
 
   _getDestinationsById(id) {

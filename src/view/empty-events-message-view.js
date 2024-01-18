@@ -1,16 +1,17 @@
-import AbstractView from '../framework/view/abstract-view.js';
-import {EMPTY_MESSAGE_TYPE} from '../const.js';
+import AbstractView from '../framework/view/abstract-view';
+import {EMPTY_MESSAGE_TYPE} from '../const';
 
 const createEmptyEventsMessageTemplate = (currentFilterType) => `<p class="trip-events__msg">${EMPTY_MESSAGE_TYPE[currentFilterType]}</p>`;
 
 export default class EmptyEventsMessageView extends AbstractView {
   #currentFilterType = null;
-  constructor ({currentFilterType}) {
+
+  constructor({currentFilterType}) {
     super();
     this.#currentFilterType = currentFilterType;
   }
 
-  get template () {
+  get template() {
     return createEmptyEventsMessageTemplate(this.#currentFilterType);
   }
 }

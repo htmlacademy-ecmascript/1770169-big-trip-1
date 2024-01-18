@@ -1,10 +1,10 @@
-import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-import {EVENT_TYPES, DEFAULT_POINT, DateFormat} from '../const.js';
-import {getLastTwoWords, toCapitalize} from '../utils/utils.js';
+import {EVENT_TYPES, DEFAULT_POINT, DateFormat} from '../const';
+import {getLastTwoWords, toCapitalize} from '../utils/point';
 
 dayjs.extend(utc);
 
@@ -201,7 +201,7 @@ export default class EventEditView extends AbstractStatefulView {
   #startDatepicker = null;
   #endDatepicker = null;
 
-  constructor (
+  constructor(
     {
       point = DEFAULT_POINT,
       destination = DEFAULT_POINT.destination,
@@ -243,15 +243,19 @@ export default class EventEditView extends AbstractStatefulView {
 
   _restoreHandlers() {
     this.element.querySelector('.event--edit').addEventListener('submit', this.#formSubmitHandler);
-    this.element.querySelector('.event--edit').addEventListener('reset', this.#handleFormReset);
+    this.element.querySelector('.event--edit').addEventListener('reset', this.#formResetHandler);
     if (this.#handleRollupButtonClick !== null) {
-      this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#handleRollupButtonClick);
+      this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rollupButtonClickHandler);
     }
     this.element.querySelector('.event__type-list').addEventListener('click', this.#eventTypeClickHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
-    this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#eventChangeHandler);
+    this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#offerChangeHandler);
     this.element.querySelector('.event__input--price')?.addEventListener('change', this.#priceChangeHandler);
     this.#initDatepicker();
+  }
+
+  reset() {
+    this.updateElement(EventEditView.parsePointsToState(this.#point, this.#destination, this.#offers, this.#checkedOffers));
   }
 
   #initDatepicker() {
@@ -264,6 +268,7 @@ export default class EventEditView extends AbstractStatefulView {
       minDate: minDateFrom,
       defaultDate: this.#point.dateFrom,
       enableTime: true,
+      'time_24hr': true,
       onChange: this.#startDateChangeHandler
     });
 
@@ -273,9 +278,25 @@ export default class EventEditView extends AbstractStatefulView {
       minDate: minDateTo,
       defaultDate: this.#point.dateTo,
       enableTime: true,
+      'time_24hr': true,
       onChange: this.#endDateChangeHandler
     });
   }
+
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormSubmit(EventEditView.parseStateToPoints(this._state));
+  };
+
+  #formResetHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFormReset();
+  };
+
+  #rollupButtonClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleRollupButtonClick();
+  };
 
   #startDateChangeHandler = ([selectedDates]) => {
     this._setState({dateFrom: dayjs.utc(selectedDates).format()});
@@ -289,6 +310,46 @@ export default class EventEditView extends AbstractStatefulView {
 
   #priceChangeHandler = (evt) => {
     this._setState({basePrice: evt.target.value});
+  };
+
+  #eventTypeClickHandler = (evt) => {
+    if (evt.target.closest('.event__type-input')) {
+      const offers = this.#getOffers(evt.target.value);
+      this.updateElement(
+        {
+          type: evt.target.value,
+          offers,
+        }
+      );
+    }
+  };
+
+  #destinationChangeHandler = (evt) => {
+    if (!this.#availableCities.includes(evt.target.value)) {
+      this.element.querySelector('.event__save-btn').disabled = true;
+      return;
+    }
+    const destination = this.#getDestination(evt.target.value);
+    this.updateElement({destination});
+  };
+
+  #offerChangeHandler = (evt) => {
+    if (evt.target.closest('.event__offer-selector')) {
+      const offerId = evt.target.dataset.offerId;
+
+      this._setState(
+        {
+          offers: {
+            ...this._state.offers,
+            offers: this._state.offers.offers.map(
+              (offer) => offer.id === offerId ?
+                {...offer, isChecked: offer.isChecked === 'checked' ? '' : 'checked'} :
+                offer
+            )
+          }
+        }
+      );
+    }
   };
 
   static parsePointsToState(points, destination, offer, checkedOffers) {
@@ -317,53 +378,4 @@ export default class EventEditView extends AbstractStatefulView {
 
     return points;
   }
-
-  reset() {
-    this.updateElement(EventEditView.parsePointsToState(this.#point, this.#destination, this.#offers, this.#checkedOffers));
-  }
-
-  #formSubmitHandler = (evt) => {
-    evt.preventDefault();
-    this.#handleFormSubmit(EventEditView.parseStateToPoints(this._state));
-  };
-
-  #eventTypeClickHandler = (evt) => {
-    if (evt.target.closest('.event__type-input')) {
-      const offers = this.#getOffers(evt.target.value);
-      this.updateElement(
-        {
-          type: evt.target.value,
-          offers,
-        }
-      );
-    }
-  };
-
-  #destinationChangeHandler = (evt) => {
-    if (!this.#availableCities.includes(evt.target.value)) {
-      this.element.querySelector('.event__save-btn').disabled = true;
-      return;
-    }
-    const destination = this.#getDestination(evt.target.value);
-    this.updateElement({destination});
-  };
-
-  #eventChangeHandler = (evt) => {
-    if (evt.target.closest('.event__offer-selector')) {
-      const offerId = evt.target.dataset.offerId;
-
-      this._setState(
-        {
-          offers: {
-            ...this._state.offers,
-            offers: this._state.offers.offers.map(
-              (offer) => offer.id === offerId ?
-                {...offer, isChecked: offer.isChecked === 'checked' ? '' : 'checked'} :
-                offer
-            )
-          }
-        }
-      );
-    }
-  };
 }

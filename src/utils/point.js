@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
-import {DateFormat} from '../const.js';
 import duration from 'dayjs/plugin/duration';
+import {DateFormat} from '../const';
 
 dayjs.extend(duration);
 
@@ -14,7 +14,7 @@ const toCapitalize = (word) => {
 
 const getDestinationNames = (destinations) => [...new Set(destinations.map((destination) => destination.name))];
 
-const getPriceSum = (points) => points.map((point) => point.basePrice).reduce((accumulator, value) => accumulator + value, 0);
+const getPriceSum = (priceList) => priceList.reduce((accumulator, value) => accumulator + value, 0);
 
 const getAbbreviatedFormat = (milliseconds) => {
   if (milliseconds < MILLISECONDS_IN_HOUR) {
@@ -40,14 +40,6 @@ const getLastTwoWords = (text) => {
   return textArray.slice(textArray.length - 2).join('-');
 };
 
-const sortByPrice = (a, b) => b.basePrice - a.basePrice;
-
-const sortByTime = (a, b) => {
-  const firstPointDuration = dayjs(a.dateTo).diff(a.dateFrom);
-  const secondPointDuration = dayjs(b.dateTo).diff(b.dateFrom);
-  return secondPointDuration - firstPointDuration;
-};
-
 const isEscape = (evt) => evt.key === 'Escape';
 
 export {
@@ -56,7 +48,5 @@ export {
   getPriceSum,
   getAbbreviatedFormat,
   getLastTwoWords,
-  sortByPrice,
-  sortByTime,
   isEscape
 };

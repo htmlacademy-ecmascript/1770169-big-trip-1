@@ -1,4 +1,4 @@
-import {ErrorMessage} from '../const.js';
+import {ErrorMessage} from '../const';
 export default class OffersModel {
   #offersApiService = null;
   #offers = null;
@@ -7,16 +7,16 @@ export default class OffersModel {
     this.#offersApiService = offersApiService;
   }
 
+  get offers() {
+    return this.#offers;
+  }
+
   async init() {
     try {
       this.#offers = await this.#offersApiService.offers;
     } catch(err) {
       throw new Error(ErrorMessage.ERROR_OFFERS_MESSAGE);
     }
-  }
-
-  get offers() {
-    return this.#offers;
   }
 
   _getOffersByType(type) {
