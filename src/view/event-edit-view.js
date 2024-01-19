@@ -258,27 +258,43 @@ export default class EventEditView extends AbstractStatefulView {
     this.updateElement(EventEditView.parsePointsToState(this.#point, this.#destination, this.#offers, this.#checkedOffers));
   }
 
+  removeElement() {
+    super.removeElement();
+
+    if (this.#startDatepicker) {
+      this.#startDatepicker.destroy();
+      this.#startDatepicker = null;
+    }
+
+    if (this.#endDatepicker) {
+      this.#endDatepicker.destroy();
+      this.#endDatepicker = null;
+    }
+  }
+
   #initDatepicker() {
     const minDateFrom = dayjs().isAfter(dayjs(this.#point.dateFrom)) ? this.#point.dateFrom : 'today';
     const minDateTo = dayjs().isAfter(dayjs(this.#point.dateTo)) ? this.#point.dateTo : 'today';
-
-    this.#startDatepicker = flatpickr(this.element.querySelector('#event-start-time-1'), {
-      allowInput: true,
+    const flatpickrOptions = {
       dateFormat: DateFormat.DATE_PICKER,
-      minDate: minDateFrom,
-      defaultDate: this.#point.dateFrom,
       enableTime: true,
       'time_24hr': true,
+      locale: {
+        firstDayOfWeek: 1
+      }
+    };
+
+    this.#startDatepicker = flatpickr(this.element.querySelector('#event-start-time-1'), {
+      ...flatpickrOptions,
+      minDate: minDateFrom,
+      defaultDate: this.#point.dateFrom,
       onChange: this.#startDateChangeHandler
     });
 
     this.#endDatepicker = flatpickr(this.element.querySelector('#event-end-time-1'), {
-      allowInput: true,
-      dateFormat: DateFormat.DATE_PICKER,
+      ...flatpickrOptions,
       minDate: minDateTo,
       defaultDate: this.#point.dateTo,
-      enableTime: true,
-      'time_24hr': true,
       onChange: this.#endDateChangeHandler
     });
   }
