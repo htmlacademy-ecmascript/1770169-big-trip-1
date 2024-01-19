@@ -1,20 +1,22 @@
 import AbstractView from '../framework/view/abstract-view';
 import dayjs from 'dayjs';
 import minMax from 'dayjs/plugin/minMax';
-import {getDestinationNames, getPriceSum} from '../utils/point';
+import {getDestinationName, calculatedPrice} from '../utils/point';
 
 dayjs.extend(minMax);
 
 const createInfoTemplate = (points, destinations, price) => {
-  const destinationNames = getDestinationNames(destinations);
-  const infoTitle = destinationNames.length <= 3 ?
-    destinationNames.join(' &mdash; ') :
-    `${destinationNames.at(0)} &mdash;...&mdash; ${destinationNames.at(-1)}`;
-  const datesFrom = dayjs.min(points.map((point) => dayjs(point.dateFrom)));
-  const datesTo = dayjs.max(points.map((point) => dayjs(point.dateTo)));
-  const infoDate = datesFrom.format('MMM') === datesTo.format('MMM') ?
-    `${datesFrom.format('MMM DD')}&nbsp;&mdash;&nbsp;${datesTo.format('DD')}` :
-    `${datesFrom.format('MMM DD')}&nbsp;&mdash;&nbsp;${datesTo.format('MMM DD')}`;
+  const destinationsId = points.map((point) => point.destination);
+  const startDestination = getDestinationName(destinations, destinationsId.at(0));
+  const endDestination = getDestinationName(destinations, destinationsId.at(-1));
+  const infoTitle = destinationsId.length <= 3 ?
+    destinationsId.map((id) => getDestinationName(destinations, id)).join(' &mdash; ') :
+    `${startDestination} &mdash;...&mdash; ${endDestination}`;
+  const dateFrom = dayjs.min(points.map((point) => dayjs(point.dateFrom)));
+  const dateTo = dayjs.max(points.map((point) => dayjs(point.dateTo)));
+  const infoDate = dateFrom.isSame(dateTo, 'month') ?
+    `${dateFrom.format('MMM DD')}&nbsp;&mdash;&nbsp;${dateTo.format('DD')}` :
+    `${dateFrom.format('MMM DD')}&nbsp;&mdash;&nbsp;${dateTo.format('MMM DD')}`;
 
   return (
     `<section class="trip-main__trip-info  trip-info">
@@ -44,24 +46,6 @@ export default class InfoView extends AbstractView {
   }
 
   get template() {
-    this.#calculatePrice();
-    return createInfoTemplate(this.#points, this.#destinations, this.#calculatePrice());
-  }
-
-  #calculatePrice() {
-    const offersId = [];
-    const offers = [];
-    this.#points.map((point) => point.offers).forEach((item) => offersId.push(...item));
-    this.#offers.map((item) => item.offers).forEach((offer) => offers.push(...offer));
-    const offersPrice = offersId.map((id) => {
-      const offer = offers.find((item) => item.id === id);
-
-      if (offer) {
-        return offer.price;
-      }
-    });
-    const pointPrice = this.#points.map((point) => point.basePrice);
-
-    return getPriceSum(offersPrice.concat(pointPrice));
+    return createInfoTemplate(this.#points, this.#destinations, calculatedPrice(this.#points, this.#offers));
   }
 }

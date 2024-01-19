@@ -1,5 +1,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import dayjs from 'dayjs';
+import he from 'he';
 import utc from 'dayjs/plugin/utc';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -65,7 +66,7 @@ const createHeaderTemplate = (
           name="event-destination"
           list="destination-list-1"
           required
-          value=${destination.name}
+          value=${he.encode(destination.name)}
           ${isDisabled ? 'disabled' : ''}
         >
         <datalist id="destination-list-1">

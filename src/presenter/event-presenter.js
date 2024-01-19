@@ -7,7 +7,7 @@ import EventCardPresenter from './event-card-presenter';
 import NewEventCardPresenter from './new-event-card-presenter';
 import UiBlocker from '../framework/ui-blocker/ui-blocker';
 import {RenderPosition, render, remove} from '../framework/render';
-import {sortByPrice, sortByTime} from '../utils/sort';
+import {sortByPrice, sortByDate, sortByTime} from '../utils/sort';
 import {filter} from '../utils/filter';
 import {ActionType, SortType, UpdateType, FilterType, TimeLimit} from '../const';
 export default class EventPresenter {
@@ -78,7 +78,7 @@ export default class EventPresenter {
       case SortType.PRICE:
         return filteredPoints.sort(sortByPrice);
       default:
-        return filteredPoints;
+        return filteredPoints.sort(sortByDate);
     }
   }
 
@@ -194,7 +194,7 @@ export default class EventPresenter {
     }
   }
 
-  #getDestination = (name) => this.#destinationsModel._getDestinationsByName(name);
+  #getDestination = (name) => this.#destinationsModel._getDestinationByName(name);
 
   #getOffers = (type) => this.#offersModel._getOffersByType(type);
 
