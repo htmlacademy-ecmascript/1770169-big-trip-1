@@ -14,7 +14,26 @@ const toCapitalize = (word) => {
 
 const getDestinationNames = (destinations) => [...new Set(destinations.map((destination) => destination.name))];
 
+const getDestinationName = (destinations, id) => destinations.find((destination) => destination.id === id).name;
+
 const getPriceSum = (priceList) => priceList.reduce((accumulator, value) => accumulator + value, 0);
+
+const calculatedPrice = (points, offers) => {
+  const offersId = [];
+  const offersList = [];
+  points.map((point) => point.offers).forEach((item) => offersId.push(...item));
+  offers.map((item) => item.offers).forEach((offer) => offersList.push(...offer));
+  const offersPrice = offersId.map((id) => {
+    const offer = offersList.find((item) => item.id === id);
+
+    if (offer) {
+      return offer.price;
+    }
+  });
+  const pointPrice = points.map((point) => point.basePrice);
+
+  return getPriceSum(offersPrice.concat(pointPrice));
+};
 
 const getAbbreviatedFormat = (milliseconds) => {
   if (milliseconds < MILLISECONDS_IN_HOUR) {
@@ -45,8 +64,9 @@ const isEscape = (evt) => evt.key === 'Escape';
 export {
   toCapitalize,
   getDestinationNames,
-  getPriceSum,
+  getDestinationName,
   getAbbreviatedFormat,
   getLastTwoWords,
-  isEscape
+  isEscape,
+  calculatedPrice
 };

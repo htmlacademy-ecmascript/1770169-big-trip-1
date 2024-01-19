@@ -55,7 +55,7 @@ export default class EventCardPresenter {
     this.#eventCardComponent = new EventCardView(
       {
         point: this.#point,
-        destination: this.#destinationsModel._getDestinationsById(this.#point.destination),
+        destination: this.#destinationsModel._getDestinationById(this.#point.destination),
         offers: this.#offersModel._getOfferItemsById(this.#point.type, this.#point.offers),
         onRollupButtonClick: this.#rollupButtonClickHandler,
         onFavoriteButtonClick: this.#favoriteButtonClickHandler
@@ -65,7 +65,7 @@ export default class EventCardPresenter {
     this.#eventEditComponent = new EventEditView(
       {
         point: this.#point,
-        destination: this.#destinationsModel._getDestinationsById(this.#point.destination),
+        destination: this.#destinationsModel._getDestinationById(this.#point.destination),
         availableCities: getDestinationNames(this.#destinations),
         offers: this.#offersModel._getOffersByType(this.#point.type),
         checkedOffers: this.#point.offers,

@@ -19,11 +19,11 @@ export default class DestinationsModel {
     }
   }
 
-  _getDestinationsById(id) {
+  _getDestinationById(id) {
     return this.#destinations.find((destination) => destination.id === id);
   }
 
-  _getDestinationsByName(name) {
+  _getDestinationByName(name) {
     return this.#destinations.find((destination) => destination.name === name);
   }
 }
