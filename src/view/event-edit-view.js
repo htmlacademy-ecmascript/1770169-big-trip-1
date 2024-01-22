@@ -124,7 +124,7 @@ const createHeaderTemplate = (
   );
 };
 
-const createOfferTemplate = ({id, title, price, isChecked = ''}, isDisabled) => {
+const createOfferTemplate = ({id, title, price, isChecked}, isDisabled) => {
   const postfix = getLastTwoWords(title);
 
   return (
@@ -136,7 +136,7 @@ const createOfferTemplate = ({id, title, price, isChecked = ''}, isDisabled) => 
         type="checkbox"
         data-offer-id = ${id}
         name="event-offer-${postfix}"
-        ${isChecked}
+        ${isChecked ? 'checked' : ''}
         ${isDisabled ? 'disabled' : ''}
       >
       <label class="event__offer-label" for="event-offer-${postfix}-1">
@@ -166,7 +166,7 @@ const createDestinationTemplate = ({description, pictures}) => (
 
     <div class="event__photos-container">
       <div class="event__photos-tape">
-        ${pictures.length !== 0 ? pictures.map((picture) => createPhotoTemplate(picture)).join('') : ''}
+        ${pictures.length ? pictures.map((picture) => createPhotoTemplate(picture)).join('') : ''}
       </div>
     </div>
   </section>`
@@ -174,8 +174,8 @@ const createDestinationTemplate = ({description, pictures}) => (
 
 const createEventDetailsTemplate = ({destination, offers, isDisabled}) => (
   `<section class="event__details">
-    ${offers.offers.length !== 0 ? createOfferListTemplate(offers, isDisabled) : ''}
-    ${Object.keys(destination).length > 2 ? createDestinationTemplate(destination) : ''}
+    ${offers.offers.length ? createOfferListTemplate(offers, isDisabled) : ''}
+    ${destination.name ? createDestinationTemplate(destination) : ''}
   </section>`
 );
 
@@ -360,7 +360,7 @@ export default class EventEditView extends AbstractStatefulView {
             ...this._state.offers,
             offers: this._state.offers.offers.map(
               (offer) => offer.id === offerId ?
-                {...offer, isChecked: offer.isChecked === 'checked' ? '' : 'checked'} :
+                {...offer, isChecked: !offer.isChecked} :
                 offer
             )
           }
@@ -375,7 +375,7 @@ export default class EventEditView extends AbstractStatefulView {
       destination,
       offers: {
         ...offer,
-        offers: offer.offers.map((item) => ({...item, isChecked: checkedOffers.includes(item.id) ? 'checked' : ''}))
+        offers: offer.offers.map((item) => ({...item, isChecked: checkedOffers.includes(item.id)}))
       },
       isDisabled: false,
       isSaving: false,
@@ -387,7 +387,7 @@ export default class EventEditView extends AbstractStatefulView {
     const points = {...state};
     points.basePrice = points.basePrice ? parseInt(points.basePrice, 10) : 0;
     points.destination = points.destination.id;
-    points.offers = points.offers.offers.filter((offer) => offer.isChecked === 'checked').map((offer) => offer.id);
+    points.offers = points.offers.offers.filter((offer) => offer.isChecked).map((offer) => offer.id);
 
     delete points.isDisabled;
     delete points.isSaving;

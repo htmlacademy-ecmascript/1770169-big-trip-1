@@ -1,11 +1,8 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import {DateFormat} from '../const';
+import {DateFormat, MILLISECONDS_IN_HOUR, MILLISECONDS_IN_DAY} from '../const';
 
 dayjs.extend(duration);
-
-const MILLISECONDS_IN_HOUR = 3600000;
-const MILLISECONDS_IN_DAY = 86400000;
 
 const toCapitalize = (word) => {
   const lower = word.toLowerCase();

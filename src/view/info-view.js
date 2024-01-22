@@ -2,6 +2,7 @@ import AbstractView from '../framework/view/abstract-view';
 import dayjs from 'dayjs';
 import minMax from 'dayjs/plugin/minMax';
 import {getDestinationName, calculatedPrice} from '../utils/point';
+import {MIN_FULL_VIEW_CITIES} from '../const';
 
 dayjs.extend(minMax);
 
@@ -9,7 +10,7 @@ const createInfoTemplate = (points, destinations, price) => {
   const destinationsId = points.map((point) => point.destination);
   const startDestination = getDestinationName(destinations, destinationsId.at(0));
   const endDestination = getDestinationName(destinations, destinationsId.at(-1));
-  const infoTitle = destinationsId.length <= 3 ?
+  const infoTitle = destinationsId.length <= MIN_FULL_VIEW_CITIES ?
     destinationsId.map((id) => getDestinationName(destinations, id)).join(' &mdash; ') :
     `${startDestination} &mdash;...&mdash; ${endDestination}`;
   const dateFrom = dayjs.min(points.map((point) => dayjs(point.dateFrom)));
