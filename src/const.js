@@ -1,18 +1,9 @@
-const FilterType = {
-  EVERYTHING: 'everything',
-  FUTURE: 'future',
-  PRESENT: 'present',
-  PAST: 'past'
-};
-
-const EMPTY_MESSAGE_TYPE = {
-  [FilterType.EVERYTHING]: 'Click New Event to create your first point',
-  [FilterType.PAST]: 'There are no past events now',
-  [FilterType.PRESENT]: 'There are no present events now',
-  [FilterType.FUTURE]: 'There are no future events now'
-};
-
+const API_URL = 'https://20.ecmascript.pages.academy/big-trip';
+const AUTH_TOKEN = 'Basic wGtu7hacTxK0W9au';
 const EVENT_TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
+const MILLISECONDS_IN_HOUR = 3600000;
+const MILLISECONDS_IN_DAY = 86400000;
+const MIN_FULL_VIEW_CITIES = 3;
 
 const DEFAULT_POINT = {
   type: 'taxi',
@@ -23,7 +14,18 @@ const DEFAULT_POINT = {
   isFavorite: false,
   offers: {offers: []}
 };
-
+const FilterType = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PRESENT: 'present',
+  PAST: 'past'
+};
+const EmptyMessageType = {
+  [FilterType.EVERYTHING]: 'Click New Event to create your first point',
+  [FilterType.PAST]: 'There are no past events now',
+  [FilterType.PRESENT]: 'There are no present events now',
+  [FilterType.FUTURE]: 'There are no future events now'
+};
 const DateFormat = {
   DATETIME_ATTRIBUTE: 'YYYY-MM-DDTHH:mm',
   DAY: 'DD',
@@ -35,7 +37,6 @@ const DateFormat = {
   HOUR_MINUTES_WITH_POSTFIX: 'HH[H] mm[M]',
   DAY_HOUR_MINUTES_WITH_POSTFIX: 'DD[D] HH[H] mm[M]'
 };
-
 const SortType = {
   DAY: 'day',
   EVENT: 'event',
@@ -43,36 +44,28 @@ const SortType = {
   PRICE: 'price',
   OFFER: 'offer'
 };
-
 const ActionType = {
   ADD_POINT: 'addPoint',
   UPDATE_POINT: 'updatePoint',
   DELETE_POINT: 'deletePoint'
 };
-
 const UpdateType = {
   PATCH: 'patch',
   MINOR: 'minor',
   MAJOR: 'major',
   INIT: 'init'
 };
-
-const API_URL = 'https://20.ecmascript.pages.academy/big-trip';
-const AUTH_TOKEN = 'Basic wGtu7hacTxK0W9au';
-
 const Path = {
   POINTS: 'points',
   OFFERS: 'offers',
   DESTINATIONS: 'destinations'
 };
-
 const Method = {
   POST: 'post',
   PUT: 'put',
   DELETE: 'delete'
 
 };
-
 const ErrorMessage = {
   ERROR_CREATE_MESSAGE: 'Failed to create point',
   ERROR_UPDATE_MESSAGE: 'Failed to update point',
@@ -80,16 +73,20 @@ const ErrorMessage = {
   ERROR_OFFERS_MESSAGE: 'Failed to load offers',
   ERROR_DESTINATIONS_MESSAGE: 'Failed to load destinations'
 };
-
 const TimeLimit = {
   LOWER_LIMIT: 350,
   UPPER_LIMIT: 1000,
 };
 
 export {
-  EMPTY_MESSAGE_TYPE,
+  API_URL,
+  AUTH_TOKEN,
   EVENT_TYPES,
+  MILLISECONDS_IN_HOUR,
+  MILLISECONDS_IN_DAY,
+  MIN_FULL_VIEW_CITIES,
   DEFAULT_POINT,
+  EmptyMessageType,
   DateFormat,
   FilterType,
   SortType,
@@ -97,8 +94,6 @@ export {
   UpdateType,
   Path,
   Method,
-  API_URL,
-  AUTH_TOKEN,
   ErrorMessage,
   TimeLimit
 };

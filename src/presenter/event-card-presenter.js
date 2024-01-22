@@ -94,37 +94,15 @@ export default class EventCardPresenter {
     remove(prevEventEditComponent);
   }
 
-  _removeComponent() {
+  removeComponent() {
     remove(this.#eventCardComponent);
     remove(this.#eventEditComponent);
   }
 
-  _resetEventCard() {
+  resetEventCard() {
     if (this.#eventStatus) {
       this.#hideEventEdit();
     }
-  }
-
-  #replaceEventCard() {
-    replace(this.#eventEditComponent, this.#eventCardComponent);
-    this.#handleEventCardReset();
-  }
-
-  #replaceEventEdit() {
-    replace(this.#eventCardComponent, this.#eventEditComponent);
-  }
-
-  #showEventEdit() {
-    this.#replaceEventCard();
-    document.addEventListener('keydown', this.#documentKeydownHandler);
-    this.#eventStatus = true;
-  }
-
-  #hideEventEdit() {
-    this.#eventEditComponent.reset();
-    this.#replaceEventEdit();
-    document.removeEventListener('keydown', this.#documentKeydownHandler);
-    this.#eventStatus = false;
   }
 
   setSaving() {
@@ -160,6 +138,28 @@ export default class EventCardPresenter {
     };
 
     this.#eventEditComponent.shake(resetFormState);
+  }
+
+  #replaceEventCard() {
+    replace(this.#eventEditComponent, this.#eventCardComponent);
+    this.#handleEventCardReset();
+  }
+
+  #replaceEventEdit() {
+    replace(this.#eventCardComponent, this.#eventEditComponent);
+  }
+
+  #showEventEdit() {
+    this.#replaceEventCard();
+    document.addEventListener('keydown', this.#documentKeydownHandler);
+    this.#eventStatus = true;
+  }
+
+  #hideEventEdit() {
+    this.#eventEditComponent.reset();
+    this.#replaceEventEdit();
+    document.removeEventListener('keydown', this.#documentKeydownHandler);
+    this.#eventStatus = false;
   }
 
   #documentKeydownHandler = (evt) => {

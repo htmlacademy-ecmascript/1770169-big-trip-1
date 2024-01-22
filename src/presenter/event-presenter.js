@@ -177,7 +177,7 @@ export default class EventPresenter {
   }
 
   #clearEventElements({resetSortType = false} = {}) {
-    this.#eventCardPresenters.forEach((presenter) => presenter._removeComponent());
+    this.#eventCardPresenters.forEach((presenter) => presenter.removeComponent());
     this.#eventCardPresenters.clear();
     this.#newEventCardPresenter.close();
 
@@ -267,7 +267,7 @@ export default class EventPresenter {
   };
 
   #eventCardResetHandler = () => {
-    this.#eventCardPresenters.forEach((presenter) => presenter._resetEventCard());
+    this.#eventCardPresenters.forEach((presenter) => presenter.resetEventCard());
     this.#newEventCardPresenter.close();
   };
 }
