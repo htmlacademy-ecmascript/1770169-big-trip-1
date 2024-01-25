@@ -1,11 +1,11 @@
 import AbstractView from '../framework/view/abstract-view';
 import {EmptyMessageType} from '../const';
 
-const createEmptyEventsMessageTemplate = (currentFilterType, errorMessage) => (
+const createMessageTemplate = (currentFilterType, errorMessage) => (
   `<p class="trip-events__msg">${errorMessage ? errorMessage : EmptyMessageType[currentFilterType]}</p>`
 );
 
-export default class EmptyEventsMessageView extends AbstractView {
+export default class MessageView extends AbstractView {
   #currentFilterType = null;
   #errorMessage = null;
 
@@ -16,6 +16,6 @@ export default class EmptyEventsMessageView extends AbstractView {
   }
 
   get template() {
-    return createEmptyEventsMessageTemplate(this.#currentFilterType, this.#errorMessage);
+    return createMessageTemplate(this.#currentFilterType, this.#errorMessage);
   }
 }

@@ -1,5 +1,5 @@
 import EventListView from '../view/event-list-view';
-import EmptyEventsMessageView from '../view/empty-events-message-view';
+import MessageView from '../view/message-view';
 import InfoView from '../view/info-view';
 import LoadingView from '../view/loading-view';
 import SortListView from '../view/sort-list-view';
@@ -13,7 +13,7 @@ import {ActionType, SortType, UpdateType, FilterType, TimeLimit} from '../const'
 export default class EventPresenter {
   #eventListComponent = new EventListView();
   #loadingComponent = new LoadingView();
-  #emptyEventsMessageComponent = null;
+  #messageComponent = null;
   #sortComponent = null;
   #infoComponent = null;
   #tripMainContainer = null;
@@ -127,9 +127,9 @@ export default class EventPresenter {
     render(this.#loadingComponent, this.#eventsContainer);
   }
 
-  #renderEmptyEventsMessageElement(errorMessage) {
-    this.#emptyEventsMessageComponent = new EmptyEventsMessageView({currentFilterType: this.#currentFilterType, errorMessage});
-    render(this.#emptyEventsMessageComponent, this.#eventsContainer);
+  #renderMessageElement(errorMessage) {
+    this.#messageComponent = new MessageView({currentFilterType: this.#currentFilterType, errorMessage});
+    render(this.#messageComponent, this.#eventsContainer);
   }
 
   #renderEventCards() {
@@ -157,7 +157,7 @@ export default class EventPresenter {
     const isNotEmpty = !!this.points.length;
 
     if (this.#pointsModel.error) {
-      this.#renderEmptyEventsMessageElement(this.#pointsModel.error);
+      this.#renderMessageElement(this.#pointsModel.error);
       return;
     }
 
@@ -174,7 +174,7 @@ export default class EventPresenter {
     this.#renderEventListElement();
 
     if (!isNotEmpty) {
-      this.#renderEmptyEventsMessageElement();
+      this.#renderMessageElement();
       return;
     }
 
@@ -194,8 +194,8 @@ export default class EventPresenter {
       this.#currentSortType = SortType.DAY;
     }
 
-    if (this.#emptyEventsMessageComponent) {
-      remove(this.#emptyEventsMessageComponent);
+    if (this.#messageComponent) {
+      remove(this.#messageComponent);
     }
   }
 
