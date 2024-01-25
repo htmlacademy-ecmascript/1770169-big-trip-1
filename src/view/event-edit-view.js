@@ -288,14 +288,14 @@ export default class EventEditView extends AbstractStatefulView {
     this.#startDatepicker = flatpickr(this.element.querySelector('#event-start-time-1'), {
       ...flatpickrOptions,
       minDate: minDateFrom,
-      defaultDate: this.#point.dateFrom,
+      defaultDate: this._state.dateFrom,
       onChange: this.#startDateChangeHandler
     });
 
     this.#endDatepicker = flatpickr(this.element.querySelector('#event-end-time-1'), {
       ...flatpickrOptions,
       minDate: minDateTo,
-      defaultDate: this.#point.dateTo,
+      defaultDate: this._state.dateTo,
       onChange: this.#endDateChangeHandler
     });
   }

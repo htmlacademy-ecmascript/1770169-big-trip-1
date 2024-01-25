@@ -20,11 +20,11 @@ export default class FilterPresenter {
 
   get filter() {
     const points = this.#pointsModel.points;
-    const obj = {};
+    const pointsNumber = {};
     Object.values(FilterType).forEach((type) => {
-      obj[type] = filter[type](points).length;
+      pointsNumber[type] = filter[type](points).length;
     });
-    return obj;
+    return pointsNumber;
   }
 
   init() {

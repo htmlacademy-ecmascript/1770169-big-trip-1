@@ -127,8 +127,8 @@ export default class EventPresenter {
     render(this.#loadingComponent, this.#eventsContainer);
   }
 
-  #renderEmptyEventsMessageElement() {
-    this.#emptyEventsMessageComponent = new EmptyEventsMessageView({currentFilterType: this.#currentFilterType});
+  #renderEmptyEventsMessageElement(errorMessage) {
+    this.#emptyEventsMessageComponent = new EmptyEventsMessageView({currentFilterType: this.#currentFilterType, errorMessage});
     render(this.#emptyEventsMessageComponent, this.#eventsContainer);
   }
 
@@ -155,6 +155,11 @@ export default class EventPresenter {
 
   #renderEventElements() {
     const isNotEmpty = !!this.points.length;
+
+    if (this.#pointsModel.error) {
+      this.#renderEmptyEventsMessageElement(this.#pointsModel.error);
+      return;
+    }
 
     if (this.#isLoading) {
       this.#renderLoader();
@@ -226,7 +231,7 @@ export default class EventPresenter {
         try {
           await this.#pointsModel._deletePoint(updateType, update);
         } catch(err) {
-          this.#eventCardPresenters.get(update.id).setDeleting();
+          this.#eventCardPresenters.get(update.id).setAborting();
         }
         break;
     }
