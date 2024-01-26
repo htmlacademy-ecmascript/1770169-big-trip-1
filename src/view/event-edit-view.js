@@ -274,10 +274,10 @@ export default class EventEditView extends AbstractStatefulView {
   }
 
   #initDatepicker() {
-    const minDateFrom = dayjs().isAfter(dayjs(this.#point.dateFrom)) ? this.#point.dateFrom : 'today';
-    const minDateTo = dayjs().isAfter(dayjs(this.#point.dateTo)) ? this.#point.dateTo : 'today';
+    const minDate = dayjs().isAfter(dayjs(this._state.dateFrom)) ? this._state.dateFrom : 'today';
     const flatpickrOptions = {
       dateFormat: DateFormat.DATE_PICKER,
+      minDate,
       enableTime: true,
       'time_24hr': true,
       locale: {
@@ -287,14 +287,12 @@ export default class EventEditView extends AbstractStatefulView {
 
     this.#startDatepicker = flatpickr(this.element.querySelector('#event-start-time-1'), {
       ...flatpickrOptions,
-      minDate: minDateFrom,
       defaultDate: this._state.dateFrom,
       onChange: this.#startDateChangeHandler
     });
 
     this.#endDatepicker = flatpickr(this.element.querySelector('#event-end-time-1'), {
       ...flatpickrOptions,
-      minDate: minDateTo,
       defaultDate: this._state.dateTo,
       onChange: this.#endDateChangeHandler
     });
