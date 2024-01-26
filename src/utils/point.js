@@ -47,13 +47,13 @@ const getAbbreviatedFormat = (milliseconds) => {
 };
 
 const getLastTwoWords = (text) => {
-  const textArray = text.toLowerCase().split(' ');
+  const words = text.toLowerCase().split(' ');
 
-  if (textArray.length <= 2) {
-    return textArray.join('-');
+  if (words.length <= 2) {
+    return words.join('-');
   }
 
-  return textArray.slice(textArray.length - 2).join('-');
+  return words.slice(words.length - 2).join('-');
 };
 
 const isEscape = (evt) => evt.key === 'Escape';

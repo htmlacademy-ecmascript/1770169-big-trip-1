@@ -71,7 +71,8 @@ const ErrorMessage = {
   ERROR_UPDATE_MESSAGE: 'Failed to update point',
   ERROR_DELETE_MESSAGE: 'Failed to delete point',
   ERROR_OFFERS_MESSAGE: 'Failed to load offers',
-  ERROR_DESTINATIONS_MESSAGE: 'Failed to load destinations'
+  ERROR_DESTINATIONS_MESSAGE: 'Failed to load destinations',
+  ERROR_SERVER_MESSAGE: 'Internal Server Error'
 };
 const TimeLimit = {
   LOWER_LIMIT: 350,

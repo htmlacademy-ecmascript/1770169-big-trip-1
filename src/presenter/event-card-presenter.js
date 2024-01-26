@@ -174,6 +174,7 @@ export default class EventCardPresenter {
       UpdateType.MINOR,
       point
     );
+    document.removeEventListener('keydown', this.#documentKeydownHandler);
   };
 
   #formResetHandler = () => {
@@ -182,6 +183,7 @@ export default class EventCardPresenter {
       UpdateType.MINOR,
       this.#point
     );
+    document.removeEventListener('keydown', this.#documentKeydownHandler);
   };
 
   #rollupButtonClickHandler = () => {

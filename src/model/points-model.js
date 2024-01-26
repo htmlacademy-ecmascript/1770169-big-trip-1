@@ -5,6 +5,7 @@ export default class PointsModel extends Observable {
   #destinationsModel = null;
   #offersModel = null;
   #points = [];
+  #error = null;
 
   constructor({pointApiService, destinationsModel, offersModel}) {
     super();
@@ -17,6 +18,10 @@ export default class PointsModel extends Observable {
     return this.#points;
   }
 
+  get error() {
+    return this.#error;
+  }
+
   async init() {
     try {
       await this.#destinationsModel.init();
@@ -24,6 +29,7 @@ export default class PointsModel extends Observable {
       this.#points = await this.#pointApiService.points;
     } catch(err) {
       this.#points = [];
+      this.#error = ErrorMessage.ERROR_SERVER_MESSAGE;
     }
 
     this._notify(UpdateType.INIT);
